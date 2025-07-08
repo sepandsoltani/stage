@@ -1,0 +1,160 @@
+\documentclass[a4paper,12pt,twoside,english,openany]{book}
+\usepackage[icon=Note,color=yellow,author=Sepand]{pdfcomment}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage[a4paper,left=3cm,right=2.5cm,top=3cm,bottom=3cm, twoside]{geometry}
+\usepackage{xcolor}
+\usepackage{stmaryrd}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{libertine}
+\usepackage[
+    natbib=true,
+    style=numeric,
+    sorting=none
+]{biblatex}
+
+\addbibresource{res/biblio.bib} 
+
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage[Export]{adjustbox}
+\usepackage{array, multirow, tabularx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{apalike}
+\usepackage{minitoc}
+\usepackage{tikz}
+\usetikzlibrary{calc, positioning, arrows.meta,arrows, shapes.geometric}
+\usepackage[strict]{changepage}
+\usepackage{siunitx}
+\usepackage{enumitem}
+\usepackage{epigraph}
+\usepackage{lscape}
+\usepackage{titletoc}
+\usepackage{mdframed}
+\usepackage{tabu}
+\usepackage{pdfpages}
+\usepackage{arydshln}
+\usepackage{titling}
+\usepackage{calc}
+\usepackage{titlesec} 
+\usepackage{sectsty}
+\usepackage{lipsum}
+\usepackage{emptypage}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage{graphicx}
+\graphicspath{ {res/} }
+\usepackage{hyperref} 
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=black,      
+    urlcolor=black,
+    citecolor=black,
+    }
+\definecolor{linkColor}{HTML}{32a852}
+
+\titleformat{\chapter}[hang]
+  {\normalfont\bfseries}{}{0pt}{\Huge}
+
+
+%\sectionfont{\color{CentraleRed}}  % sets colour of sections
+%\subsectionfont{\color{uclablue}}  % sets colour of subsections, ou gray, teal 
+\definecolor{darkseagreen}{rgb}{0.56, 0.74, 0.56}
+
+\title{Estimation of Image-Derived Arterial Input Function in Brain PET Imaging: \\ Application to Modeling PET Dynamics of Glucose Metabolism in Patients with Impaired Consciousness}
+\author{Sepand Ali Madad Soltani}
+\date{March 2025}
+
+
+
+\leftmark 
+\rightmark 
+
+
+\usepackage[xindy]{imakeidx}
+% \makeindex
+%\input{auxilliaires/glossaire}
+\def\mrglu{\text{MR}_{\text{glu}}}
+\newcommand{\fdg}{$^{18}\text{F-FDG}$}
+\begin{document}
+
+\begin{titlepage}
+	\begin{center}
+		\begin{tabular}{c@{\hskip 7cm}c@{\hskip 1cm}}
+			\includegraphics[height=3cm]{res/ucbl.png} &
+			\includegraphics[height=3cm]{res/polytech.png}
+		\end{tabular}
+	\end{center}
+
+	\begin{center}
+
+		\vspace*{.03\textheight}
+		\textsc{\Large University of Claude Bernard Lyon 1}\\[0.2cm]
+		\large Polytech Lyon
+
+		\rule{\textwidth}{0.8pt} \\
+		\vspace{10pt}
+
+		{\Large \bfseries \thetitle}
+		\rule{\textwidth}{0.8pt} \\
+
+	\end{center}
+
+	\vfill
+	\begin{center}
+		By \textsc{\Large Sepand Ali Madad Soltani}\\[1cm]
+        Master 2 in Medical Device Engineering \\ 
+		Internship Report\\[1.2cm]
+		Supervised by \textsc{\large Inés Mérida}
+		and
+		\textsc{\large Nicolas Costes}  \\[0.2cm]
+		Academic Advisor: \textsc{\large Kevin Tse Ve Koon}\\[0.2cm]
+		2024-2025
+
+	\end{center}
+
+	\vspace{1cm}
+\end{titlepage}
+
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+
+
+\frontmatter
+\include{src/abstract}
+\tableofcontents
+
+\mainmatter
+\setlength{\parskip}{.7em}
+
+\renewcommand{\baselinestretch}{1.1}
+
+
+\fancyhead[]{}
+\fancyfoot[]{}
+\fancyhead[LH]{\leftmark}
+\fancyhead[RH]{\thepage}
+
+
+\input{src/introduction}
+\input{src/methods}
+\input{src/implementation}
+\input{src/results}
+\input{src/discussion}
+\input{src/conclusion}
+\newpage
+\fancyhead{}
+\fancyhead[L]{\textsc{References}}
+\printbibliography[
+	heading=bibintoc,
+	title={References}]
+
+
+
+\end{document}
+

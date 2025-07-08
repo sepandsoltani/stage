@@ -1,0 +1,25 @@
+\chapter{Discussion}
+The Bayesian Geometric Transfer Matrix (BGTM) method demonstrated significant improvements in IDIF accuracy compared to classical GTM approaches through enhanced handling of partial volume effects.
+This advancement was achieved by integrating TOF-MRA-guided carotid segmentation with population-based AIF prior knowledge within a Bayesian framework.
+
+The refined segmentation algorithm, particularly through implementation of the cuboid mask, proved crucial for processing challenging data from comatose patients who frequently present brain lesions (Figure~\ref{fig:seg_compare}).
+However, occasional over-conservatism in vessel selection suggests the region-growing and thresholding parameters can be optimized to accurately capture the complete carotid structure.
+The lack of reference or ground truth carotid mask prevented the evaluation of the segmentation.
+This also disabled us from accurately evaluating the proposed IDIF algorithm, as the calculated errors are accumulated with the segmentation error as well.
+With labeled data, deep learning approaches such as U-Net can also be explored to improve segmentation accuracy \cite{ronneberger2015u}.
+
+
+The cAUC error reduction (Figure~\ref{subfig:cauc_boxplot}) confirms Bayesian priors effectively constrain AIF estimates to physiological ranges.
+The strong correlation between cAUC errors and quantification errors (Figure~\ref{fig:corr_mat}) validates cAUC as a robust intermediate metric for IDIF assessment, enabling rapid validation without requiring full kinetic modeling.
+
+Quantitative analysis revealed strong agreement between BGTM and AIF-derived $\mrglu$ values, with the Bayesian approach achieving a 57\% reduction in absolute error compared to conventional GTM methods (Table~\ref{tab:metrics}).
+Despite this improvement, the observed MAPE results exhibited substantial dispersion (Coefficient of Variation = 71\%).
+This inconsistency is particularly evident in outlier cases where BGTM underperformed (Figure~\ref{fig:ifs}).
+Although, further investigation is required to fully characterize the underlying causes, one plausible factor could be TOF-MRA/PET misregistration resulting in inaccurate TAC extraction.
+
+
+Our analysis was limited to a comatose patient cohort from a single imaging center, which may limit generalizability to populations with normal cerebral blood flow.
+Future validation should incorporate multi-center studies involving both healthy subjects and different radiotracers to establish broader applicability.
+
+Additionally, the current PCA implementation of randomly selecting 10 subjects from the population lacks practical viability for standardized implementation.
+Future iterations should only be limited to a predefined population.

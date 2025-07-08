@@ -1,0 +1,165 @@
+\chapter{Materials and Methods}
+
+\section{Dataset Description}
+56 acute comatose patients were included in the study between 7 days and 30 days after the coma onset (46 ± 16 years old; 21 females).
+PET data were acquired in list mode during 90 min from the injection of an intravenous bolus of \fdg.
+Simultaneously, an arterial time-of-flight MR was acquired in axial orientation, with a voxel size of 0.3$\times$0.3$\times$0.7 mm.
+Raw PET data were rebinned into 24-time frames (variable length frames : 8$\times$15 s, 3$\times$60 s, 5$\times$120 s, 1$\times$300 s, 7$\times$600 s) sinograms for dynamic reconstruction.
+Reconstruction yielded a voxel size of 1.04$\times$1.04$\times$2.08 mm$^3$ in a matrix of 344$\times$344$\times$127 voxels .
+
+AIF in the whole blood and plasma were measured from 26 arterial blood samples manually collected (with the following timing: every 5 s for the first minute, every 15 s until second minute, and at times 3, 5, 10, 20, 30, 45, 60, 75, 80, 85 and 90 minutes post-injection) and counted with a gamma counter.
+
+\section{Carotid Segmentation\label{sec:carotid}}
+Figure~\ref{fig:seg_pipeline} shows the complete pipeline for the carotid segmentation.
+Since vessels appear as hypersignal in TOF-MRA, a high-intensity thresholding technique was employed (Step II).
+The top 1\% of the voxels 
+Only voxels exceeding this threshold and located outside the brain mask were retained.
+Next, a region-growing step (Step III) was applied to refine the initial selection, ensuring that continuous vascular structures were captured as the final carotid mask \cite{irace2021bayesian}.
+
+In addition to arteries, venous structures and possible brain lesions may also appear as hypersignal and might be selected by the algorithm.
+To exclude them, a cuboid mask was defined in a reference image covering the neck area up to the bottom of the brain, where the carotid artery is most likely to appear (Step I).
+The reference image used was the standard MNI152 atlas, which was registered to one of the subject's TOF-MRA images.
+This registration artificially increased the FOV---effectively achieved by zero-padding the matrix---to include the neck region.
+The TOF-MRA image was then registered to the reference image using an affine registration technique (\texttt{\small FSL FLIRT}) \cite{jenkinson2012fsl}.
+Using the obtained affine matrix, the cuboid mask was first transformed and then applied to the TOF-MRA image before thresholding (Step II) to ensure the mentioned unwanted tissues will not affect the intensity histograms and do not get selected as carotid.
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}[
+			node distance=1cm,
+			auto,
+			>=Stealth,
+			mybox/.style={draw, rounded corners, rectangle, minimum width=3cm, minimum height=1cm, align=center}
+		]
+		\node[mybox] (input) {TOF-MRA};
+		\node[mybox, right=of input] (cuboid) {I) Cuboid Mask\\Application};
+
+		\node[mybox, right=of cuboid] (thresh) {II) Adaptive\\ Threshold};
+		\node[mybox, below=of thresh] (growing) {III) Largest 2 Regions};
+		\node[mybox, left=of growing] (dilation) {IV) Dilation};
+		\node[mybox, below=of growing] (mask) {Carotid\\Mask};
+		\node[mybox, below=of dilation] (bg_mask) {Background\\Mask};
+
+		\draw[->] (input) -- (cuboid);
+		\draw[->] (cuboid) -- (thresh);
+		\draw[->] (thresh) -- (growing);
+		\draw[->] (growing) -- (mask);
+		\draw[->] (growing) -- (dilation);
+		\draw[->] (dilation) -- (bg_mask);
+	\end{tikzpicture}
+	\caption{Carotid and background mask segmentation pipeline}
+	\label{fig:seg_pipeline}
+\end{figure}
+
+\section{Partial Volume Correction}
+\subsection{Geometric Transfer Matrix}
+Direct quantification with the IDIF extracted from the MRI mask of the carotid is impractical due to the strong Partial Volume Effects (PVE) in PET images. % explain PVE 
+This however can be corrected by the use of the Geometric Transfer Matrix (GTM) method \cite{rousset1998correction}.
+This method considers the observered TAC to be the linear combination of the true real value and the other effecting regions.
+Here we define two regions, the carotid and the surrounding tissues (background).
+A mask for extracting the activities of the latter was obtained by dilating the carotid mask by 5 pixels and subtracting the voxels corresponding to the carotid mask (Figure~\ref{fig:seg_pipeline}, Step IV).
+
+\begin{equation}
+	\underbrace{
+		\begin{bmatrix}
+			T_{c} \\
+			T_{bg}
+		\end{bmatrix}
+	}_{\text{Observered}}
+	=
+	\underbrace{
+		\begin{bmatrix}
+			\omega_{c \rightarrow c}  & \omega_{bg \rightarrow c}  \\
+			\omega_{c \rightarrow bg} & \omega_{bg \rightarrow bg}
+		\end{bmatrix}
+	}_{\text{GTM}}
+	.
+	\underbrace{
+		\begin{bmatrix}
+			T_{IF} \\
+			T_{tissue}
+		\end{bmatrix}
+	}_{\text{Unknown}},
+\end{equation}
+
+where $\omega_{n \rightarrow m}$ are the spill-in and spill-over coefficient of region $n$ onto region $m$, which is obtained by convolving the binary mask of region $n$ with the system's point spread function and integrating the resulting intensity over region $m$, normalized by the total signal in region $m$.
+where
+\begin{equation}
+	\omega_{n\to m} = \frac{\displaystyle \int_{\Omega_m} \bigl( h \ast \chi_n \bigr)(r)\,dr}{\displaystyle \int_{\Omega_m} \bigl( h \ast \chi_m \bigr)(r)\,dr},
+\end{equation}
+with \(\chi_n\) and \(\chi_m\) denoting the binary masks of regions \(n\) and \(m\), respectively, \(h\) the system's point spread function, and \(\Omega_m\) the spatial domain of region \(m\).
+
+$T_{c}$ and $T_{bg}$ are respectively the observered carotid and background TACs and $T_{IF}$ and $T_{tissue}$ are the real unknown TACs of the carotid (the input function) and the background tissue.
+
+By inversing the GTM, this system of equations can be easily solved.
+However, the GTM being a low rank matrix makes the inversion sensitive to noise and biased on small regions such as the carotid \cite{zanotti2011image, boellaard2004effects}.
+
+\subsection{Bayesian Geometric Transfer Matrix}
+To overcome challenges posed to GTM method, we utilized a Bayesian framework that jointly estimates the input function and tissue kinetics \cite{irace2021bayesian}.
+For each subject, $T_{IF}$ is modeled as a linear combination of a population mean and its principal components.
+These components are derived by performing principal component analysis (PCA) on a set of AIFs collected from the population. Specifically, for each subject, a subset of 10 random subjects is selected from the dataset—excluding the subject under study—to construct the PCA model.
+\begin{equation}
+	T_{IF}(t) = \mu(t) + \theta_{1} v_{1}(t) + \theta_{2} v_{2}(t) + \theta_{3} v_{3}(t),
+\end{equation}
+where \(\mu(t)\) is the population mean AIF, \(v_{i}(t)\) are the principal components obtained from PCA, and \(\theta_{i}\) are the subject-specific weighting coefficients.
+
+The background TAC is then generated by convolving this modeled input function with an impulse response function (IRF) defined by a two-tissue compartment model \cite{jouvie2013estimation}.
+
+\begin{equation}
+	T_{bg}(t) = T_{IF}(t) \circledast IRF(t; K_1, k_2, k_3),
+\end{equation}
+
+where $K_1$, $k_2$, and $k_3$ are kinetic parameters of the two-tissue compartment and $IRF$ is
+\begin{equation}
+	IRF(t) = a_0 e^{-(k_2+k_3)t} + a_1\text{ with } a_0= \frac{K_1 k_2}{k_2+k_3}, a_1= \frac{K_1 k_3}{k_2+k_3}.
+\end{equation}
+
+Parameter estimation is performed using a Metropolis-within-Gibbs Markov Chain Monte Carlo (MCMC) sampler, which explores the posterior distribution of both the kinetic parameters and the PCA coefficients.
+In the Bayesian framework \cite{irace2021bayesian}, all model parameters are collected into the vector $\Theta$. The posterior distribution of $\Theta$ given the observed data $\mathcal{D}$ is expressed as
+\begin{equation}
+	p(\Theta \mid \mathcal{D}) \propto p(\mathcal{D} \mid \Theta) \pi(\Theta),
+\end{equation}
+
+where \( p(\mathcal{D} \mid \Theta) \) is the likelihood function and \( \pi(\Theta) \) is the prior distribution over the parameters \( \Theta = (\theta_{1}, \theta_{2}, \theta_{3}, K_{1}, k_{2}, k_{3}) \). The maximum a posteriori (MAP) estimate of \( \Theta \) is given by:
+
+\begin{equation}
+	\hat{\Theta}
+	=
+	\arg\max_{\Theta}
+	\left\{
+	\ln p(\mathcal{D} \mid \Theta)
+	+
+	\ln \pi(\Theta)
+	\right\}.
+\end{equation}
+
+\section{Evaluation}
+\subsection{IF Curves}
+The performance of the proposed IDIF estimation was first evaluated by computing the mean absolute error (MAE) between the cumulative area under the curve (cAUC) of the estimated IDIF and the \textit{ground true} AIF. cAUC was considered to be a more suitable metric since it provides an integrated measure of tracer exposure over time and is less sensitive to local fluctuations or noise in the curve compared to the directly comparing the TACs.
+\begin{equation}
+	\textrm{cAUC}(t) =  \int_{0}^{t} IF(\tau) \, d\tau,
+\end{equation}
+where \(IF\) is the input function.
+
+\subsection{Quantification}
+However, because the cAUC error does not fully capture the impact of IDIF deviations on kinetic parameters, absolute quantification was also performed to evaluate the performance of the estimated IDIF against the gold standard AIF.
+This was achieved by utilzing an irreversible two-tissue compartment model (2TCM) via non-linear fitting with the \texttt{fitk3} program from the TPCCLIB library developed at the Turku PET Centre \cite{oikonen2018tpcclib}—applying the model fitting once with the IDIF and once with the AIF as the input function.
+
+The brain was segmented into regions of interest (ROI) based on the Hammersmith brain atlas \cite{hammers2003three}, and TACs were generated by averaging voxels over each ROI at every time point.
+The regional influx rate (\(K_i\)) was then calculated, from which the corresponding \(\mrglu\) values were derived.
+
+The mean absolute percentage error (MAPE) of the \(\textrm{MR}_{glu}\) in each ROI was calculated and then averaged across the entire dataset:
+\begin{equation}
+	\text{Average MAPE}(\mrglu)= \frac{100\%}{N} \sum_{i=1}^{N} \left( \frac{1}{N_{\text{ROI}}} \sum_{j=1}^{N_{\text{ROI}}} \left| \frac{\textrm{MR}_{\textrm{glu},ij}^{\textrm{IDIF}} - \textrm{MR}_{\textrm{glu},ij}^{\textrm{AIF}}}{\textrm{MR}_{\textrm{glu},ij}^{\textrm{AIF}}} \right| \right),
+\end{equation}
+where $N$ is the number of subjects.
+
+Additionally, linear least-squares regression was performed between the regional \(\mrglu\) obtained by quantification with using AIF and IDIF for each subject. The coefficient of determination (\(R^2\)) and the regression slope (\(S\)) were obtained for each subject. The mean absolute errors of these metrics across the dataset are given by
+\begin{equation}
+	\text{MAE}(R^2) = \frac{1}{N} \sum_{i=1}^{N} \left| R^2_i - 1 \right|
+\end{equation}
+and
+\begin{equation}
+	\text{MAE}(S) = \frac{1}{N} \sum_{i=1}^{N} \left| S_i - 1 \right|,
+\end{equation}
+where $N$ is the number of subjects and \(R^2_i\) and \(S_i\) denote the coefficient of determination and the regression slope for subject \(i\), respectively.
