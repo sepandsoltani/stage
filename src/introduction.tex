@@ -101,13 +101,17 @@ Here, \(\textrm{MR}_{glu}\) represents the metabolic rate of glucose, \([C]\) de
 The arterial input function (AIF) is considered the gold standard for obtaining the input function.
 It is determined by inserting an arterial catheter into the patient and continuously drawing blood samples to measure the radiotracer concentration, thereby obtaining the blood activity curve used in the quantification model.
 However, this procedure is invasive and can cause discomfort, potentially discouraging patients from undergoing future examinations.
-Furthermore, this method is labor-intensive and requires trained personnel to manage both the patient and the measurement devices.
+Furthermore, this method is labor-intensive and requires trained personnel to manage both the subject and the measurement devices.
 
 \subsection{Image Derived Input Function}
 The image-derived input function (IDIF) has been proposed as a non-invasive alternative for obtaining the input function.
 IDIF techniques typically involve identifying vascular structures or regions with high blood pool activity within the imaging field and extracting the input function directly from the PET images.
 In brain PET imaging, the carotid arteries are the largest vessels present in the limited field of view (FOV) and have a diameter of approximately 5 mm, which is comparable to the typical spatial resolution of PET (4-6mm FWHM).
-Therefore, directly extracting the carotids from PET images is impractical due to the limited resolution and the strong partial volume effects (PVE) present.
+Therefore, directly extracting the carotids from PET images is challenging due to the limited resolution and the strong partial volume effects (PVE) present.
+
+Many methods have utilized the first few frames of the dynamic PET where tracer only exists in the arteries and has not reached other tissues yet, to perform a high intensity tresholding to obtain the mask of the carotids \cite{young2023image}.
+Due to PVE, these methods are not totally accurate therefore many different and clever approaches e.g. supervised clustering
+
 
 With the emergence of hybrid PET/MRI machines, it has become feasible to acquire both functional and anatomical data simultaneously.
 MRI provides high-resolution soft tissue contrast, while PET captures metabolic activity.
@@ -116,7 +120,12 @@ However, even with a high-resolution anatomical guidance, directly applying the 
 In particular, the limited spatial resolution of PET can lead to partial volume effects, resulting in inaccuracies in the derived input function.
 Consequently, additional correction techniques are required to mitigate these effects and ensure reliable quantification.
 
+Several methods have been developed to enhance IDIF accuracy by addressing partial volume correction and artery segmentation.
+PET-only methods aim to extract the artery from the PET image itself which is
+
+
 Several methods have been developed to enhance IDIF accuracy by addressing partial volume correction and automation challenges.
+For partial volume correction,
 Early PET-only approaches primarily focused on classical partial volume correction (PVC) techniques \cite{mourik2009image}, while more recent methods have explored supervised clustering algorithms \cite{lyoo2014image} and deep learning approaches \cite{chavan2024end,ferrante2024physically}.
 Hybrid PET/MRI methods improve carotid artery delineation by leveraging anatomical imaging. The caliPER software, for instance, employs a semi-automated approach for IDIF extraction using carotid masks obtained from T1 or TOF-MRA images, incorporating partial volume correction \cite{dassanayake2022caliper}.
 Additionally, fully automated methods have been proposed to enhance carotid segmentation and PVC techniques \cite{sari2017estimation, jochimsen2016fully, khalighi2018image, sundar2019towards}.
