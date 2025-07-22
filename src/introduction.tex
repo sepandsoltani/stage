@@ -109,8 +109,12 @@ IDIF techniques typically involve identifying vascular structures or regions wit
 In brain PET imaging, the carotid arteries are the largest vessels present in the limited field of view (FOV) and have a diameter of approximately 5 mm, which is comparable to the typical spatial resolution of PET (4-6mm FWHM).
 Therefore, directly extracting the carotids from PET images is challenging due to the limited resolution and the strong partial volume effects (PVE) present.
 
+\subsection{Partial Volume Effect}
+
+\subsection{Background}
 Many methods have utilized the first few frames of the dynamic PET where tracer only exists in the arteries and has not reached other tissues yet, to perform a high intensity tresholding to obtain the mask of the carotids \cite{young2023image}.
 Due to PVE, these methods are not totally accurate therefore many different and clever approaches e.g. supervised clustering
+
 
 
 With the emergence of hybrid PET/MRI machines, it has become feasible to acquire both functional and anatomical data simultaneously.

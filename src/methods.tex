@@ -1,27 +1,28 @@
 \chapter{Materials and Methods}
 
 \section{Dataset Description}
-56 acute comatose patients were included in the study between 7 days and 30 days after the coma onset (46 ± 16 years old; 21 females).
+59 acute comatose patients were included in the study between 7 days and 30 days after the coma onset (46 ± 16 years old; 21 females).
 PET data were acquired in list mode during 90 min from the injection of an intravenous bolus of \fdg.
-Simultaneously, an arterial time-of-flight MR was acquired in axial orientation, with a voxel size of 0.3$\times$0.3$\times$0.7 mm.
+Simultaneously, an arterial time-of-flight MR (TOF-MRA)  in axial orientation, with a voxel size of 0.3$\times$0.3$\times$0.7 mm as well as a T1-weighted MRI in axial orientation, with isometric voxel size of 1mm were acquired.
 Raw PET data were rebinned into 24-time frames (variable length frames : 8$\times$15 s, 3$\times$60 s, 5$\times$120 s, 1$\times$300 s, 7$\times$600 s) sinograms for dynamic reconstruction.
 Reconstruction yielded a voxel size of 1.04$\times$1.04$\times$2.08 mm$^3$ in a matrix of 344$\times$344$\times$127 voxels .
 
 AIF in the whole blood and plasma were measured from 26 arterial blood samples manually collected (with the following timing: every 5 s for the first minute, every 15 s until second minute, and at times 3, 5, 10, 20, 30, 45, 60, 75, 80, 85 and 90 minutes post-injection) and counted with a gamma counter.
 
+\section{Pre-processing}
+Although the patients were unconscious and the PET and MRI images were acquired simultaneously, out of abundance of caution, the T1-weighted image was registered to both the average PET image and to the TOF-MRA image using a affine registration method. The two resulting affine transformation matrices were then used to register the TOF-MRA directly to the PET.
+The T1-weighted image was used as a medium since it has common spatial features with both the other two modalities and directly registering TOF-MRA to the PET would be impractical due to the low-resolution of the PET and the limited FOV of the TOF-MRA images.
+
 \section{Carotid Segmentation\label{sec:carotid}}
 Figure~\ref{fig:seg_pipeline} shows the complete pipeline for the carotid segmentation.
-Since vessels appear as hypersignal in TOF-MRA, a high-intensity thresholding technique was employed (Step II).
-The top 1\% of the voxels 
-Only voxels exceeding this threshold and located outside the brain mask were retained.
-Next, a region-growing step (Step III) was applied to refine the initial selection, ensuring that continuous vascular structures were captured as the final carotid mask \cite{irace2021bayesian}.
+Since vessels appear as hypersignal in TOF-MRA, a high-intensity thresholding technique can be used to extract the arteries from the image.
+However, venous structures and brain lesion which were very common in out cohort may also appear as hypersignal and can interfere with our selection.
+To exclude them, a cuboid volume of interest (VOI) was defined in a reference image where the carotid arteries are most likely to appear (Step I).
+The threshold was calculated as the 1\% percentile of all non-zero voxels in the image and then it was applied to only to the voxels inside the VOI.
 
-In addition to arteries, venous structures and possible brain lesions may also appear as hypersignal and might be selected by the algorithm.
-To exclude them, a cuboid mask was defined in a reference image covering the neck area up to the bottom of the brain, where the carotid artery is most likely to appear (Step I).
-The reference image used was the standard MNI152 atlas, which was registered to one of the subject's TOF-MRA images.
-This registration artificially increased the FOV---effectively achieved by zero-padding the matrix---to include the neck region.
-The TOF-MRA image was then registered to the reference image using an affine registration technique (\texttt{\small FSL FLIRT}) \cite{jenkinson2012fsl}.
-Using the obtained affine matrix, the cuboid mask was first transformed and then applied to the TOF-MRA image before thresholding (Step II) to ensure the mentioned unwanted tissues will not affect the intensity histograms and do not get selected as carotid.
+The reference image used was the standard MNI152 atlas, which was padded by 50\% more voxels in the inferior direction of the brain (negative Z in voxel-space) since the original atlas excludes the area below the brain which is of the interest for us.
+
+The TOF-MRA image was then registered to the reference image using an affine registration technique and the obtained affine matrix was used to register and then apply the VOI to the TOF-MRA.
 
 \begin{figure}[h]
 	\centering
@@ -53,9 +54,9 @@ Using the obtained affine matrix, the cuboid mask was first transformed and then
 
 \section{Partial Volume Correction}
 \subsection{Geometric Transfer Matrix}
-Direct quantification with the IDIF extracted from the MRI mask of the carotid is impractical due to the strong Partial Volume Effects (PVE) in PET images. % explain PVE 
-This however can be corrected by the use of the Geometric Transfer Matrix (GTM) method \cite{rousset1998correction}.
-This method considers the observered TAC to be the linear combination of the true real value and the other effecting regions.
+As we discussed before in \ref{TODO}, direct extraction of the radioactivity in the arteries is not practical due to PVC.
+Geometric Transfer Matrix aims to account for this loss of signal by considering the observed TACs are linear combination of the true value and other effecting regions \cite{rousset1998correction}.
+
 Here we define two regions, the carotid and the surrounding tissues (background).
 A mask for extracting the activities of the latter was obtained by dilating the carotid mask by 5 pixels and subtracting the voxels corresponding to the carotid mask (Figure~\ref{fig:seg_pipeline}, Step IV).
 
@@ -65,7 +66,7 @@ A mask for extracting the activities of the latter was obtained by dilating the 
 			T_{c} \\
 			T_{bg}
 		\end{bmatrix}
-	}_{\text{Observered}}
+	}_{\text{Observed}}
 	=
 	\underbrace{
 		\begin{bmatrix}
@@ -89,38 +90,73 @@ where
 \end{equation}
 with \(\chi_n\) and \(\chi_m\) denoting the binary masks of regions \(n\) and \(m\), respectively, \(h\) the system's point spread function, and \(\Omega_m\) the spatial domain of region \(m\).
 
-$T_{c}$ and $T_{bg}$ are respectively the observered carotid and background TACs and $T_{IF}$ and $T_{tissue}$ are the real unknown TACs of the carotid (the input function) and the background tissue.
+$T_{c}$ and $T_{bg}$ are respectively the observed carotid and background TACs and $T_{IF}$ and $T_{tissue}$ are the real unknown TACs of the carotid (the input function) and the background tissue.
 
-By inversing the GTM, this system of equations can be easily solved.
+By inverting the GTM, this system of equations can be easily solved.
+% However, through a combination of small size of the carotids and short time frames and exponential decay of the tracer
+However, GTM along with other classical PVE methods usually fail to fully recover the lost signal as they are a simplification that do not consider the whole picture particularly accounting for the time-variant noise experienced in the signal.
+This causes these methods to not only fail to correct the noise but end up amplifying them because of the assumptions.
+The time-variant noise can be attributed to number of contributing factors, namely, the small size of the arteries, very short frame-times at the beginning of the scan where the changes in the input function are very rapid and rapid decay of the radiotracer which in all result in low-count statistic hence having higher noise.
+
 However, the GTM being a low rank matrix makes the inversion sensitive to noise and biased on small regions such as the carotid \cite{zanotti2011image, boellaard2004effects}.
 
 \subsection{Bayesian Geometric Transfer Matrix}
-To overcome challenges posed to GTM method, we utilized a Bayesian framework that jointly estimates the input function and tissue kinetics \cite{irace2021bayesian}.
+\subsubsection{Modelling}
+To overcome challenges posed to GTM method, we utilized a Bayesian framework that jointly estimates the input function, the tissue activity and the system noise\cite{irace2021bayesian}.
 For each subject, $T_{IF}$ is modeled as a linear combination of a population mean and its principal components.
-These components are derived by performing principal component analysis (PCA) on a set of AIFs collected from the population. Specifically, for each subject, a subset of 10 random subjects is selected from the dataset—excluding the subject under study—to construct the PCA model.
-\begin{equation}
-	T_{IF}(t) = \mu(t) + \theta_{1} v_{1}(t) + \theta_{2} v_{2}(t) + \theta_{3} v_{3}(t),
-\end{equation}
-where \(\mu(t)\) is the population mean AIF, \(v_{i}(t)\) are the principal components obtained from PCA, and \(\theta_{i}\) are the subject-specific weighting coefficients.
-
-The background TAC is then generated by convolving this modeled input function with an impulse response function (IRF) defined by a two-tissue compartment model \cite{jouvie2013estimation}.
+These components are derived by performing principal component analysis (PCA) on a set of arterial input functions (AIFs) collected from the population.
+Specifically, for each subject, a subset of 10 random subjects is selected from the dataset—excluding the subject under study—to construct the PCA model.
+The data are first zero-centered, and PCA is applied to extract the principal axes \(\phi_i(t)\) and their corresponding explained variances \(\lambda_i\).
+Each axis is then scaled by \(\sqrt{\lambda_i}\) to yield components \(v_i(t)\) with distribution of \(\mathcal{N}(0,1)\). The input function is then modeled as:
 
 \begin{equation}
-	T_{bg}(t) = T_{IF}(t) \circledast IRF(t; K_1, k_2, k_3),
+	T_{IF}(t) = \mu(t) + \sum_{i=1}^3 \theta_i\,v_i(t),
 \end{equation}
 
-where $K_1$, $k_2$, and $k_3$ are kinetic parameters of the two-tissue compartment and $IRF$ is
-\begin{equation}
-	IRF(t) = a_0 e^{-(k_2+k_3)t} + a_1\text{ with } a_0= \frac{K_1 k_2}{k_2+k_3}, a_1= \frac{K_1 k_3}{k_2+k_3}.
-\end{equation}
+with
+\[
+	v_i(t) = \sqrt{\lambda_i}\,\phi_i(t),
+\]
+where \(\mu(t)\) is the population mean AIF, \(\phi_i(t)\) are the principal axes obtained from PCA, \(\lambda_i\) are their explained variances, \(v_i(t)\) are the scaled components with unit variance, and \(\theta_i \sim \mathcal{N}(0,1)\) are subject-specific weighting coefficients.
 
-Parameter estimation is performed using a Metropolis-within-Gibbs Markov Chain Monte Carlo (MCMC) sampler, which explores the posterior distribution of both the kinetic parameters and the PCA coefficients.
+Spectral Analysis (SA) has been proposed as a decomposition method for describing the tissue activity in dynamic PET.
+This method produces a spectrum of kinetic components by modelling the TACs as a convolution of the input function with a impulse response function \cite{TODO}.
+
+The impulse response function is considered as sum of multiple exponentials. Therefor the background TAC will be
+\[
+	T_{bg} = \sum_{i=1}^k \alpha_{i} \cdot T_{IF} \circledast e^{-\beta_{i} t}.
+\]
+The number of basis functions (\(k\)) should be selected so it can accurately describe the activity of the tracer while avoiding being chosen too high to avoid over complicating and also introducing noise.
+For \fdg, the optimal number of basis function was found to be just one.
+
+
+Accurately modelling the noise is nearly impossible as there are numerous sources of them.
+Some sources of noise such as scattering effect, random events, and motion artifacts among others are considered corrected for by the reconstruction program.
+However the signal in the artery suffers from a special case since they are heavily effected by "low-count statistics" caused by short time frames at beginning of the scan when the changes in the input function are very rapid and by exponential decay of the radiotracer at the end of the scan.
+
+Noise in raw PET counts is considered to be a Poisson distribution however after the reconstruction process it is widely assumed to be a Gaussian distribution \cite{TODO}. To account for the previously mentioned time-variant noise, weights are used to normalize the noise along all frames to a single a statistic. We define the weights as
+\[
+	\omega_{i} = \frac{\Delta t_i}{C_T(t_i)} e^{\frac{-t_{i} ln(2)}{T_{1/2}}}
+\]
+where \(\omega_i\) is the weight and \(\Delta t_i\) is the frame duration of the \(i\)th frame, \(C_T(t_i)\) is the total radioactivity concentration at the mid-time frame, and \(T_{1/2}\) is the half-life of the radioisotope. \(C_T(t_i)\) can also be substituted with \(c_i\), the net-true count of the PET frame.
+
+The time-variant noise can be normalized as the weighted mean of the per frame noise:
+
+\[
+    \epsilon = \frac{1}{N} \sum_{i=1}^{N} \omega_i \epsilon_{i}.
+\]
+
+\subsubsection{Estimation}
+Let us define all model parameters in to the vector \( \Theta = (\theta_{1}, \theta_{2}, \theta_{3}, \alpha_{1}, \beta_{1}, \dots) \) and \(\mathcal{D}\) as the observed PET TAC.
+
+
+Parameter estimation is performed using a Metropolis-within-Gibbs Markov Chain Monte Carlo (MCMC) sampler, which explores the posterior distribution of both the kinetic parameters of the tissue activity and the PCA coefficients of the input function and the noise in the system.
 In the Bayesian framework \cite{irace2021bayesian}, all model parameters are collected into the vector $\Theta$. The posterior distribution of $\Theta$ given the observed data $\mathcal{D}$ is expressed as
 \begin{equation}
 	p(\Theta \mid \mathcal{D}) \propto p(\mathcal{D} \mid \Theta) \pi(\Theta),
 \end{equation}
 
-where \( p(\mathcal{D} \mid \Theta) \) is the likelihood function and \( \pi(\Theta) \) is the prior distribution over the parameters \( \Theta = (\theta_{1}, \theta_{2}, \theta_{3}, K_{1}, k_{2}, k_{3}) \). The maximum a posteriori (MAP) estimate of \( \Theta \) is given by:
+where \( p(\mathcal{D} \mid \Theta) \) is the likelihood function and \( \pi(\Theta) \) is the prior distribution over the parameters \( \Theta = (\theta_{1}, \theta_{2}, \theta_{3}, \alpha_{1}, \beta_{1}, \dots) \). The maximum a posteriori (MAP) estimate of \( \Theta \) is given by:
 
 \begin{equation}
 	\hat{\Theta}
