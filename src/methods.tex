@@ -131,23 +131,34 @@ For \fdg, the optimal number of basis function was found to be just one.
 
 
 Accurately modelling the noise is nearly impossible as there are numerous sources of them.
-Some sources of noise such as scattering effect, random events, and motion artifacts among others are considered corrected for by the reconstruction program.
-However the signal in the artery suffers from a special case since they are heavily effected by "low-count statistics" caused by short time frames at beginning of the scan when the changes in the input function are very rapid and by exponential decay of the radiotracer at the end of the scan.
+Some sources of noise such as scattering effect, random events, and motion artifacts among others are corrected to some degree by the reconstruction program.
+However the biggest contributer of noise is "low-count statistics" which is caused by short time frames at the begin of the scan and by the exponential decay of the radioisotope towards the end of the scan apparent by the low dose of the tracer injection.
+This combined with the samll size of the carotid introduces a massive challenge for recovering the lost signal.
 
-Noise in raw PET counts is considered to be a Poisson distribution however after the reconstruction process it is widely assumed to be a Gaussian distribution \cite{TODO}. To account for the previously mentioned time-variant noise, weights are used to normalize the noise along all frames to a single a statistic. We define the weights as
+Noise in raw PET counts is considered to be a Poisson distribution however after the reconstruction process it is widely assumed to be a Gaussian distribution \cite{TODO}. To account for the previously mentioned time-variant noise, weights are used to normalize the noise along all frames to a single statistic. We define the weights as
 \[
-	\omega_{i} = \frac{\Delta t_i}{C_T(t_i)} e^{\frac{-t_{i} ln(2)}{T_{1/2}}}
+	\omega_{i} = \frac{\Delta t_i}{c_i} e^{\frac{-t_{i} ln(2)}{T_{1/2}}}
 \]
-where \(\omega_i\) is the weight and \(\Delta t_i\) is the frame duration of the \(i\)th frame, \(C_T(t_i)\) is the total radioactivity concentration at the mid-time frame, and \(T_{1/2}\) is the half-life of the radioisotope. \(C_T(t_i)\) can also be substituted with \(c_i\), the net-true count of the PET frame.
+where \(\omega_i\) is the weight, \(\Delta t_i\) is the frame duration, and \(c_i\) is the net-true counts detected by the PET camera at the \(i\)th frame and  \(T_{1/2}\) is the half-life of the radioisotope.
+However, \(c_i\) was substituted here with \(C_T(t_i)\), the total radioactivity concentration at the mid-time frame due to unavalibility of these counts in our dataset.
 
 The time-variant noise can be normalized as the weighted mean of the per frame noise:
 
 \[
-    \epsilon = \frac{1}{N} \sum_{i=1}^{N} \omega_i \epsilon_{i}.
+	\eta= \frac{1}{N} \sum_{i=1}^{N} \omega_i \eta_{i}.
 \]
 
 \subsubsection{Estimation}
-Let us define all model parameters in to the vector \( \Theta = (\theta_{1}, \theta_{2}, \theta_{3}, \alpha_{1}, \beta_{1}, \dots) \) and \(\mathcal{D}\) as the observed PET TAC.
+Let us define  \(\mathcal{D}\) as the observed PET TAC, \( \Theta = (\theta_{1}, \theta_{2}, \theta_{3}, \alpha_{1}, \beta_{1}, \dots) \) the set of parameters describing the system, and consider a Gaussian noise present in the system \(\eta\) with \(\Theta\) and \(\eta\) being unknown. We seek to estimate the joint probability \(p(\Theta,\eta \mid \mathcal{D})\) of the model parameters \(\Theta\) and noise level given the observed data \(\mathcal{D}\)
+
+According to the Bayes rule:
+\[
+    p(\Theta,\eta \mid \mathcal{D}) \propto p(\mathcal{D} \mid \Theta,\eta) \cdot \pi( \Theta ) \cdot \pi( \eta )
+\]
+
+where  \(p(\Theta,\eta \mid \mathcal{D})\) is the posterior distribution, \(p(\mathcal{D} \mid \Theta,\eta)\) is the likelihood, and $\pi(\Theta)$ and $\pi(\eta)$ are the prior knowledge that we have on the set of parameters and the noise. Thus we can sample the posterior distribution given we can calculate the likelihood and the priors.
+
+The likelihood is 
 
 
 Parameter estimation is performed using a Metropolis-within-Gibbs Markov Chain Monte Carlo (MCMC) sampler, which explores the posterior distribution of both the kinetic parameters of the tissue activity and the PCA coefficients of the input function and the noise in the system.
