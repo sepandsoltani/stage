@@ -126,11 +126,12 @@ This method produces a spectrum of kinetic components by modelling the TACs as a
 
 The impulse response function is considered as sum of multiple exponentials. Therefor the background TAC will be
 \[
-	T_{bg} = \sum_{i=1}^k \alpha_{i} \cdot T_{IF} \circledast e^{-\beta_{i} t}.
+	T_{bg} = \sum_{i=1}^s \alpha_{i} \cdot T_{IF} \circledast e^{-\beta_{i} t}.
 \]
-Where \(alpha_i\) is the weighting factor
-The number of basis functions (\(k\)) should be selected so it can accurately describe the activity of the tracer while avoiding being chosen too high to avoid over complicating and also introducing noise.
-For \fdg, the optimal number of basis function was found to be just one.
+Where $\circledast$ denotes the convolution operator, \(\alpha_i\) is the coefficient. and \(\beta_i\) is the frequency of th \(i\)th spectrum.
+
+The number of basis functions (\(s\)) should be selected so it can accurately describe the activity of the tracer while avoiding being chosen too high to avoid over complicating and also introducing noise.
+% For \fdg, the optimal number of basis function was found to be just one.
 
 
 Accurately modelling the noise is nearly impossible as there are numerous sources of them.
@@ -145,24 +146,36 @@ Noise in raw PET counts is considered to be a Poisson distribution however after
 where \(\omega_i\) is the weight, \(\Delta t_i\) is the frame duration, and \(c_i\) is the net-true counts detected by the PET camera at the \(i\)th frame and  \(T_{1/2}\) is the half-life of the radioisotope.
 However, \(c_i\) was substituted here with \(C_T(t_i)\), the total radioactivity concentration at the mid-time frame due to unavalibility of these counts in our dataset.
 
-The time-variant noise can be normalized as the weighted mean of the per frame noise:
+The time-variant noise variances can be normalized as the weighted mean of the per frame variance:
 
 \[
-	\eta= \frac{1}{N} \sum_{i=1}^{N} \omega_i \eta_{i}.
+	\sigma^2= \frac{1}{N} \sum_{i=1}^{N} \omega_i \sigma^2.
 \]
 
 \subsubsection{Estimation}
-Let us define  \(\mathcal{D}\) as the observed PET TAC, \( \Theta = (\theta_{1}, \theta_{2}, \theta_{3}, \alpha_{1}, \beta_{1}, \dots) \) the set of parameters describing the system, and consider a Gaussian noise present in the system \(\eta\) with \(\Theta\) and \(\eta\) being unknown. We seek to estimate the joint probability \(p(\Theta,\eta \mid \mathcal{D})\) of the model parameters \(\Theta\) and noise level given the observed data \(\mathcal{D}\)
+Let us define  \(\mathcal{D}\) as the observed PET TAC, \( \Theta = (\theta_{1}, \theta_{2}, \theta_{3}, \alpha_{1}, \beta_{1}, \dots) \) as the set of unknown parameters describing the system, and consider an unknown Gaussian noise present in the system. We seek to estimate the joint probability \(p(\Theta,\sigma^2\mid \mathcal{D})\) of the model parameters \(\Theta\) and noise level given the observed data \(\mathcal{D}\)
 
 According to the Bayes rule:
 \[
-	p(\Theta,\eta \mid \mathcal{D}) \propto p(\mathcal{D} \mid \Theta,\eta) \cdot \pi( \Theta ) \cdot \pi( \eta )
+	p(\Theta,\sigma^2 \mid \mathcal{D}) \propto p(\mathcal{D} \mid \Theta,\sigma^2) \cdot \pi( \Theta ) \cdot \pi( \sigma^2)
 \]
 
-where  \(p(\Theta,\eta \mid \mathcal{D})\) is the posterior distribution, \(p(\mathcal{D} \mid \Theta,\eta)\) is the likelihood, and $\pi(\Theta)$ and $\pi(\eta)$ are the prior knowledge that we have on the set of parameters and the noise. Thus we can sample the posterior distribution given we can calculate the likelihood and the priors.
+where  \(p(\Theta,\sigma^2 \mid \mathcal{D})\) is the posterior distribution, \(p(\mathcal{D} \mid \Theta,\sigma^2)\) is the likelihood, and $\pi(\Theta)$ and $\pi(\sigma^2)$ are the prior knowledge that we have on the set of parameters and the noise. Thus we can sample the posterior distribution by calculate the likelihood and having the priors.
 
-The likelihood is
 
+We can derive the observed data from the GTM response of the model \ref{TODO}. For convinience, we define
+\[
+	\mathcal{T}(t) = \mathcal{G}(t;\Theta) =
+	\mathcal{G}\left(
+	\begin{bmatrix}
+			T_{IF}(t;\theta_{1}, \theta_{2}, \theta_{3}) \\
+			T_{tissue}(t;\alpha_{1}, \beta_{1}, \dots)
+		\end{bmatrix}\right)
+\]
+where $\mathcal{G}$ is the GTM model and $\mathcal{T}$ is the percieved activity based on the GTM model.
+\[
+    L(\Theta, \sigma^2) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi \sigma^2}} \exp\left( -\frac{(\mathcal{D}(t_i) - \mathcal{T}(t_i))^2}{2\sigma^2} \right)
+\]
 
 Parameter estimation is performed using a Metropolis-within-Gibbs Markov Chain Monte Carlo (MCMC) sampler, which explores the posterior distribution of both the kinetic parameters of the tissue activity and the PCA coefficients of the input function and the noise in the system.
 In the Bayesian framework \cite{irace2021bayesian}, all model parameters are collected into the vector $\Theta$. The posterior distribution of $\Theta$ given the observed data $\mathcal{D}$ is expressed as
