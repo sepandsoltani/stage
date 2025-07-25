@@ -20,7 +20,7 @@ The blood samples were counted with a gamma counter and were centrifuged and the
 \section{Pre-processing}
 For both studies, the T1-weighted image was registered to both the average PET image and to the TOF-MRA image using a affine registration method.
 The two resulting affine transformation matrices were then combined to register the TOF-MRA directly to the PET.
-Even though in the \fdg study, the patients were completely unconscious and the PET and MRI images were acquired simultaneously in the same session, this was still done out of an abundance of caution.
+Even though in the \fdg $\,$ study, the patients were completely unconscious and the PET and MRI images were acquired simultaneously in the same session, this was still done out of an abundance of caution.
 The T1-weighted image was used as a medium since it has common spatial features with both the other two modalities and directly registering TOF-MRA to the PET would be impractical due to the low spatial resolution of the PET and the limited axial FOV of the TOF-MRA images.
 
 \section{Carotid Segmentation\label{sec:carotid}}
@@ -188,6 +188,7 @@ where $\mathcal{G}$ is the GTM model and $\mathcal{T}$ is the perceived activity
 \[
 	p(\mathcal{D} \mid \Theta,\sigma^2) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi \sigma^2}} \exp\left( -\frac{\omega_i(\mathcal{D}(t_i) - \mathcal{T}(t_i))^2}{2\sigma^2} \right).
 \]
+Hence from this point forward, we call this method as the Bayesian Geometric Transfer Matrix (Bayesian GTM or BGTM).
 
 The prior of parameters can be expanded as
 
@@ -202,7 +203,7 @@ The prior for the frequency and amplitude in SA was chosen as a reasonable unifo
 
 The prior distribution for the noise variance, $\pi(\sigma^2)$, is specified as an inverse-gamma distribution with hyperparameters $a_0$ and $b_0$ since inverse-gamma is the prior conjugate for the variance of a normal distribution
 \[
-	\sigma^2 \sim \Gamma^{-1}(a_0,b_0)
+    \pi(\sigma^2) \sim \Gamma^{-1}(a_0,b_0)
 \]
 
 In this work, the hyperparameters are selected so that $\pi(\sigma^2)$ is centered around an empirical estimate of the TAC variance, computed as the weighted root mean squared error between the observed carotid TAC and the mean AIF.
@@ -210,7 +211,7 @@ In this work, the hyperparameters are selected so that $\pi(\sigma^2)$ is center
 \[
 	\mathbb{E}[X] = \frac{1}{N} \sum_{i=1}^{N} (T_c(t_i) - \mu(t_i))^2
 \]
-Thus by choosing a Coefficient of Variation (CV), we will have
+Thus by choosing an arbitrary Coefficient of Variation (CV), we will have
 \[
 	a_0 = 2 + \frac{1}{\mathrm{CV}^2}\, , \, b_0 = (a_0 - 1) \, \mathbb{E}[X]
 \]
@@ -286,10 +287,37 @@ and
 where $N$ is the number of subjects and \(R^2_i\) and \(S_i\) denote the coefficient of determination and the regression slope for subject \(i\), respectively.
 
 \section{Simulation}
-PET simulations are an integral part of the validation of statistical and analytical PET methods as they have the advantage of knowing the exact ground truth which is not always available or might be effected by human or instrument malfunction.
+PET simulations are an integral part of the validation of statistical and analytical PET methods as they have the advantage of knowing the exact ground truth which is not always available or might be effected by human error or instrumental malfunction.
 In the previous section, we considered the AIF to be the gold standard and the ground truth and the evaluation was done by comparing the method to it.
-But since the AIF is taken and analysed manually and involves multiple devices and processes operated by different personnels (nurses and chemists) at different steps, there is a large possibility for mistakes.
+But since the AIF is taken and analysed manually and involves multiple devices and processes operated by different personnels (machine operators, nurses, and biochemists) at different steps, there is a large possibility for mistakes.
 
 For this reason, as a complementary validation step to the experimental datasets, simulations were conducted and the method will be evaluated on them as well.
 
-PET-SORTEO is a realistic Monte-Carlo PET simulation platform
+PET-SORTEO is a realistic Monte-Carlo PET simulation platform which its accuracy has been validated numerous times \ref{TODO} and for that reason can be considered as close to a real PET acquisition.
+However, this accuracy heavily depends on describing the brain physical anatomy and the tracer's biochemical processes in the tissue.
+
+Thus, as the input, PET-SORTEO requires the description and performance of a PET machine, a 3D emission numerical phantom segmenting the brain in to different emitting regions, a 3D attenuation numerical phantom describing the attenuation coefficient of the tissues, and lastly the Time Activity Curves in each emitting regions.
+
+For this study, we seek to replicate the \fdg$\,$ dataset again in the simulation.
+Thus we chose Biograph mMR scanner as the scanner and we took inspirations from the real MR and PET data to create our numerical phantoms and the TACs.
+
+Firstly, using the regional brain atlas of the subject, the sub-regions were merged to create larger regions of White Matter(WM), Gray Matter(GM), Gray Nuclei (GN), Cerebellar Gray Matter(CGM), and Cerebellar White Matter(CWM).
+An algorithm that was originally designed for creating pseudo CT from T1-weighted image for bone attenuation correction in PET reconstruction was used here to create masks for the bone \ref{TODO}.
+Values above 300 were considered as the bone (BONE) and values between -300 and 300 were considered as Extra-cerebral Soft Tissues (SOFT) --- after subtracting the brain---which includes the scalp, neck muscles, glands, eyes, etc.
+The left over area between the skull and the brain was considered as the Cerebrospinal fluid (CSF).
+And lastly, from the segmentation of TOF-MRA \ref{TODO section}, the mask of the artery (ICA) was obtained.
+And lastly, the 9 different regions were overlapped together to create the final emission phantom.
+
+The attenuation phantom was again created from the pseudo-CT by segmenting the scan in to SOFT and BONE and filling them with their respective attenuation coefficients.
+
+The resulting emission phantom was then registered to the PET space to extract TACs from the PET scan of the subject.
+The TACs were then corrected for PVE by GTM.
+The partial volume corrected TACs were then fitted to a (2TCM) to remove any possible noise and to achieve a so-called "perfect" TACs.
+The AIF used in the fitting was also the real AIF of the subject that was fitted to a exponential model for the same reason\ref{feng}.
+A few consideration were still taken in to account.
+Namely, our definition of SOFT tissue is very broad and although it is sufficient for the purpose of simulation, it breaks the rule of homogeneity required for compartment modelling thus the raw unfitted TAC was kept for this specific region.
+The pseudo-CT generation algorithm was very permissive in its definition of the BONE thus the resulting TAC was higher than reality since signal from the brain and the scalp was leaked in to it.
+So it was empirically decided that the value of the BONE should be halved.
+The CSF region is very narrow at points therefor it is heavily effected by PVE so GTM fails to correct for it.
+So the CSF TAC was considered to be 0.2 of the fitted WM TAC.
+
