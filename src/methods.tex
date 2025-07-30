@@ -69,7 +69,7 @@ As we discussed before in \ref{TODO}, direct extraction of the radioactivity in 
 Geometric Transfer Matrix aims to account for this loss of signal by considering the observed TACs are linear combination of the true value and other effecting regions \cite{rousset1998correction}.
 
 Here we define two regions, the carotid and the surrounding tissues (background).
-A mask for extracting the activities of the latter was obtained by dilating the carotid mask by 5 pixels and subtracting the voxels corresponding to the carotid mask (Figure~\ref{fig:seg_pipeline}, Step IV).
+A mask for extracting the activities of the latter was obtained by dilating the carotid mask by 5 mm and subtracting the voxels corresponding to the carotid mask (Figure~\ref{fig:seg_pipeline}, Step IV).
 
 \begin{equation}
 	\underbrace{
@@ -139,9 +139,6 @@ The impulse response function is considered as sum of multiple exponentials. The
 \]
 Where $\circledast$ denotes the convolution operator, \(\alpha_i\) is the coefficient. and \(\beta_i\) is the frequency of the \(i\)th spectrum.
 
-In model fitting using SA, an appropriate spectral range is chosen based on the radioisotope half-life and is then divided in to $s=100$ or $s=1000$ fixed frequencies ($\beta$).
-The distinct peaks in the resulting spectrum are kept.
-In our model ,t his approach would not be efficient. Instead we select the number of spectral peaks and let the model to tune the frequencies and the amplitudes (see section \ref{TODO}).
 
 \subsubsection{Noise}
 

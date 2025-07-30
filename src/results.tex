@@ -1,9 +1,10 @@
 \chapter{Results}
 \section{Carotid Segmentation from MRA-TOF}
-The measures described in Section~\ref{sec:carotid} significantly improved carotid segmentation by effectively excluding brain lesions and undesired venous structures.
-As illustrated in Figure~\ref{fig:seg_compare}, the cuboid mask plays a crucial role in this process.
-Because no ground truth segmentation is available, visual inspection was used to evaluate the results, which showed that lesions and venous structures were rarely selected by the algorithm.
-However, the algorithm acted overly conservative at times. It inadvertently excluded the periphery of the larger vessels or completely excluded the narrow ones.
+As illustrated in Figure~\ref{fig:seg_compare}, the cuboid mask plays a crucial role in the carotid segmentation.
+Because no ground truth segmentation is available, visual inspection was used to evaluate the results.
+% The measures described in Section~\ref{sec:carotid} significantly improved carotid segmentation by effectively excluding brain lesions and undesired venous structures.
+% , which showed that lesions and venous structures were rarely selected by the algorithm.
+% However, the algorithm acted overly conservative at times. It inadvertently excluded the periphery of the larger vessels or completely excluded the narrow ones.
 \begin{figure}[h]
 	\centering
 	\begin{subfigure}{0.45\textwidth}
@@ -19,9 +20,39 @@ However, the algorithm acted overly conservative at times. It inadvertently excl
 	\caption{Comparison of carotid segmentation (green) with (a) and without (b) a cuboid mask (yellow). In the absence of the cuboid mask, the segmentation algorithm fails to capture the carotid and instead incorrectly identifies the brain lesion}
 	\label{fig:seg_compare}
 \end{figure}
+
+\section{Hyperparameter Tuning}
+
+The number of principle components $p$ was chosen as 3 by analysing the explained variance ratio plot in Figure~\ref{TODO}.
+We see with only 3 components we get more than 90\% explained variability.
+To prove the availability of the method, we seek to find the lowest possible number of population needed for the PCA in our \fdg $\,$ dataset.
+To do this, the experiment was repeated 10 times each time with a different random seed for choosing population for $N=\{5,10,20,30,40,60\}$ and the resulting quantification errors were averaged.
+As apparent in Figure~\ref{TODO}, we see a plateau in the performance after $N=10$ [TODO] and it was chosen as the ideal population sample count.
+
+In model fitting using SA, an appropriate spectral range is chosen based on the radioisotope half-life (e.g. $10^{-4} \mathrm{s}^{-1}$ to $1 \mathrm{s}^{-1}$ for $^{18}\mathrm{F}$ ) and is then divided in to $s=100$ or $s=1000$ fixed frequencies ($\beta$) then their amplitudes ($\alpha$) are fitted to the TAC \ref{TODO}.
+However, estimating 100 or 1000 different amplitude parameters using MCMC would not be computationally feasible.
+Instead we must chose an appropriate number of spectral peaks and let the model to tune the frequencies and the amplitudes together.
+
+To derive the number of basis functions, we assumed the activity in the surrounding tissue can either be modelled as 1TCM or 2TCM which their Impulse Response Function (IRF) have respectively one and two basis functions.
+With two basis functions, it was found that the model rarely results in two distinctive frequencies and would generally converge to similar values.
+Thus for both datasets one basis function was chosen.
+
+As discussed in Section~\ref{TODO}, the prior distribution used for the PCA weighting coefficients was $\theta_i \sim \mathcal{N}(0,1)$.
+The prior for the SA parameters were considered a very uninformative uniform distribution $\mathcal{U}(0,0.01)$ as we [TODO]
+
+
+\section{Simulation}
+From the 59 subjects in the \fdg $\,$ dataset, 24 subjects were excluded due to having very large brain tumors or opened skulls due to open brain surgery which caused the tissue classification algorithm to fail.
+The rest of the 35 subjects were used to create the numerical phantoms
+
+
+
+
 \section{IDIF}
-Since BGTM is mixture between a Population Based Input Function (PBIF) and the GTM method, the BGTM is evaluated and compared to both of these methods.
-IDIF estimation was performed using both the Bayesian GTM (BGTM) and conventional GTM PVC methods.
+
+Since BGTM relies on the GTM method and also depends on a population AIF. Thus the performance should be compared compared to the IDIF derived from GTM method and also the Population Based Input Function (PBIF) which is the mean AIF used in the PCA.
+
+
 Figure~\ref{fig:ifs} compares the two methods for one of the best- and worst-performing subjects.
 In the well-performing subject, BGTM significantly outperforms GTM ($\mrglu$ MAPE of 3.1\% vs. 20.9\%); however, in the poorly performing case, BGTM falls short of GTM ($\mrglu$ MAPE of 31.4\% vs. 19.5\%).
 The average mean absolute error of the cAUC curves across the dataset was 14,202 for BGTM and 33,764 for GTM (Figure~\ref{subfig:cauc_boxplot}).
