@@ -28,23 +28,30 @@ We see with only 3 components we get more than 90\% explained variability.
 To prove the availability of the method, we seek to find the lowest possible number of population needed for the PCA in our \fdg $\,$ dataset.
 To do this, the experiment was repeated 10 times each time with a different random seed for choosing population for $N=\{5,10,20,30,40,60\}$ and the resulting quantification errors were averaged.
 As apparent in Figure~\ref{TODO}, we see a plateau in the performance after $N=10$ [TODO] and it was chosen as the ideal population sample count.
+For the \yohimbine$\,$ dataset since it only has 7 subjects, $N=6$ was chosen.
 
 In model fitting using SA, an appropriate spectral range is chosen based on the radioisotope half-life (e.g. $10^{-4} \mathrm{s}^{-1}$ to $1 \mathrm{s}^{-1}$ for $^{18}\mathrm{F}$ ) and is then divided in to $s=100$ or $s=1000$ fixed frequencies ($\beta$) then their amplitudes ($\alpha$) are fitted to the TAC \ref{TODO}.
+The peaks in the resulting spectrum are considered as the [TODO] frequencies of the TAC.
 However, estimating 100 or 1000 different amplitude parameters using MCMC would not be computationally feasible.
-Instead we must chose an appropriate number of spectral peaks and let the model to tune the frequencies and the amplitudes together.
+Instead we must chose an appropriate number of spectral components and let the model to tune the frequencies and the amplitudes together.
 
 To derive the number of basis functions, we assumed the activity in the surrounding tissue can either be modelled as 1TCM or 2TCM which their Impulse Response Function (IRF) have respectively one and two basis functions.
-With two basis functions, it was found that the model rarely results in two distinctive frequencies and would generally converge to similar values.
+Experiments with two basis functions showed that the model rarely results in two distinctive frequencies and would generally converge to similar values for both frequencies.
 Thus for both datasets one basis function was chosen.
 
 As discussed in Section~\ref{TODO}, the prior distribution used for the PCA weighting coefficients was $\theta_i \sim \mathcal{N}(0,1)$.
-The prior for the SA parameters were considered a very uninformative uniform distribution $\mathcal{U}(0,0.01)$ as we [TODO]
+The prior for the SA parameters were considered a very uninformative uniform distribution $\mathcal{U}(10^{-5},10^{-2})$ as we did not have concrete prior knowledge on these parameters.
 
 
 \section{Simulation}
 From the 59 subjects in the \fdg $\,$ dataset, 24 subjects were excluded due to having very large brain tumors or opened skulls due to open brain surgery which caused the tissue classification algorithm to fail.
-The rest of the 35 subjects were used to create the numerical phantoms
+The rest of the 35 subjects were used to create the numerical phantoms and to generate TACs for the simulations.
+Although the point of the simulation was not to replicate the same subject exactly but only use it as an inspiration for what real TACs look like, the results of the simulations were compared to the real scans as a quality control step.
+In Figure~\ref{TODO} we see the 2nd and last frame axial [TODO] view of the real PET, the simulation input, and the simulation output.
+As expected we see less details in the neck area (SOFT region) since we did not consider the complete arterial and venous structure as well as glands. But more importantly, we can clearly see the activity in the internal carotids.
+In the last frame we can also see the activity of the brain to be very realistic.
 
+However, the 
 
 
 

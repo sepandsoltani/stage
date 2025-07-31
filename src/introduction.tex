@@ -34,15 +34,6 @@ The tracer kinetics are governed by a series of first-order differential equatio
 \end{align}
 where \(K_1\), \(k_2\), \(k_3\), and \(k_4\) are the constant rate parameters.
 
-It is generally assumed that once \fdg$ $ is phosphorylated (i.e., bound), there is little to no dephosphorylation back to the free (unbound) compartment \cite{schmidt1992errors}.
-Therefore, we can set \(k_4 = 0\), treating the process as irreversible.
-Thus, Equations~\eqref{eq:2tcm-c1} and \eqref{eq:2tcm-c2} simplify to
-\begin{align}
-	\frac{dC_F(t)}{dt} & = K_1 \, C_P(t) \;-\; \bigl(k_2 + k_3\bigr) C_F(t) \,, \\[6pt]
-	\frac{dC_B(t)}{dt} & = k_3 \, C_F(t) \,.
-\end{align}
-
-
 \begin{figure}[b]
 	\centering
 	\begin{tikzpicture}[>=latex, thick]
@@ -83,37 +74,46 @@ The total radiotracer tissular kinetic measured by PET (the PET data), \(C_T(t)\
 \end{equation}
 
 Thus to solve this system of equations and to estimate \(K_1\), \(k_2\), and \(k_3\) parameters, we must fit the model using the measured PET TACs ($C_T$) and the input function ($C_P$).
-% to the measured PET TACs ($C_T$), using \(C_P(t)\) as the input function.
-Consequently, the influx rate (trapping rate) of \fdg$ $ in the tissue, \(K_i\), can be derived as
-\begin{equation}
-	K_i = \frac{K_1 \times k_3}{k_2 + k_3} \,.
-\end{equation}
 
-\fdg$ $ is an analog of glucose, not glucose itself.
-To convert the \fdg$ $ trapping rate into the actual rate of glucose metabolism, both the glucose concentration and the lumped constant must be taken into account.
+For \fdg$\,$ quantification, the metabolic rate of glucose (\(\textrm{MR}_{\textrm{glu}}\)) is calculated as
 \begin{equation}
-	\textrm{MR}_{glu} \; (\textrm{\textmu mol/min/100g}) = \frac{[C]}{LC} \cdot K_i \,.
+	\textrm{MR}_{\textrm{glu}} \; (\textrm{\textmu mol/min/100g}) = \frac{[C]}{LC} \cdot \frac{K_1 \times k_3}{k_2 + k_3} \,.
 \end{equation}
-Here, \(\textrm{MR}_{glu}\) represents the metabolic rate of glucose, \([C]\) denotes the glucose concentration, and \(LC\) is the lumped constant.
+where \([C]\) denotes the glucose concentration, and \(LC\) is the lumped constant.
+
+For \yohimbine $\,$ quantification, we utilize the Volume of Distribution ($V_T$) which is the ratio of radiotracer concentration in the target tissue ($C_T$) to the plasma ($C_P$):
+\[
+	V_T = \frac{C_T}{C_P}
+\]
+
+Using the Logan plot method this can be directly estimated from these two values or to be fitted to a compartment model. In the latter case, $V_T$ can be calculated as
+\[
+	V_T = \frac{K_1}{k_2} (1+\frac{k_3}{k_4})
+\]
+
 
 \section{Input Function}
 \subsection{Arterial Input Function}
+% GPT: Dont change
 The arterial input function (AIF) is considered the gold standard for obtaining the input function.
 It is determined by inserting an arterial catheter into the patient and continuously drawing blood samples to measure the radiotracer concentration, thereby obtaining the blood activity curve used in the quantification model.
 However, this procedure is invasive and can cause discomfort, potentially discouraging patients from undergoing future examinations.
 Furthermore, this method is labor-intensive and requires trained personnel to manage both the subject and the measurement devices.
 
 \subsection{Image Derived Input Function}
+% GPT: Dont change
 The image-derived input function (IDIF) has been proposed as a non-invasive alternative for obtaining the input function.
 IDIF techniques typically involve identifying vascular structures or regions with high blood pool activity within the imaging field and extracting the input function directly from the PET images.
 In brain PET imaging, the carotid arteries are the largest vessels present in the limited field of view (FOV) and have a diameter of approximately 5 mm, which is comparable to the typical spatial resolution of PET (4-6mm FWHM).
 Therefore, directly extracting the carotids from PET images is challenging due to the limited resolution and the strong partial volume effects (PVE) present.
 
-\subsection{Partial Volume Effect}
+\subsection{Population-Based Input Function}
+Population-Based Input Function (PBIF) is a method for replacing the subject specifc AIF with the average AIFs of a population of other subjects.
+% GPT: explain a bit more, max 1-2 sentences
 
 \subsection{Background}
 Many methods have utilized the first few frames of the dynamic PET where tracer only exists in the arteries and has not reached other tissues yet, to perform a high intensity tresholding to obtain the mask of the carotids \cite{young2023image}.
-Due to PVE, these methods are not totally accurate therefore many different and clever approaches e.g. supervised clustering
+Due to PVE, these methods are not totally accurate therefore many different take clever approaches such as supervised clustering \cite{TODO}, Deep learning approaches \cite{TODO} and [TODO] \ref{TODO}
 
 
 

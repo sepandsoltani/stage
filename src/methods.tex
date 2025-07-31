@@ -142,7 +142,7 @@ Where $\circledast$ denotes the convolution operator, \(\alpha_i\) is the coeffi
 
 \subsubsection{Noise}
 
-Accurately modelling the noise is nearly impossible as there are numerous sources of them.
+Accurately modelling the noise is very challenging as there are numerous sources of them.
 Some sources of noise such as scattering effect, random events, and motion artifacts among others are corrected to some degree by the reconstruction program.
 However the biggest contributor of noise is "low-count statistics" which is caused by short time frames at the begin of the scan and by the exponential decay of the radioisotope towards the end of the scan apparent by the low dose of the tracer injection.
 This combined with the small size of the carotid introduces a massive challenge for recovering the lost signal.
@@ -152,7 +152,7 @@ Noise in raw PET counts is considered to be a Poisson distribution however after
 	\omega_{i} = \frac{\Delta t_i}{c_i} e^{\frac{-t_{i} ln(2)}{T_{1/2}}}
 \]
 where \(\omega_i\) is the weight, \(\Delta t_i\) is the frame duration, and \(c_i\) is the net-true counts detected by the PET camera at the \(i\)th frame and  \(T_{1/2}\) is the half-life of the radioisotope.
-However, \(c_i\) was substituted here with \(C_T(t_i)\), the total radioactivity concentration at the mid-time frame due to unavailability of these counts in our dataset.
+However, \(c_i\) was substituted here with \(C_T(t_i)\), the total radioactivity concentration at the mid-time frame due to unavailability of these counts in our datasets.
 
 The time-variant noise variances can be normalized as the weighted mean of the per frame variance.
 
@@ -162,7 +162,8 @@ The time-variant noise variances can be normalized as the weighted mean of the p
 
 
 \subsubsection{Estimation}
-Let us define  \(\mathcal{D}\) as the observed PET TAC, \( \Theta = (\theta_{1}, \dots,\theta_{p}, \alpha_{1}, \beta_{1}, \dots, \alpha_{s}, \beta_{s}) \) as the set of unknown parameters describing the system, and consider an unknown Gaussian noise present in the system. We seek to estimate the joint probability \(p(\Theta,\sigma^2\mid \mathcal{D})\) of the model parameters \(\Theta\) and noise level given the observed data \(\mathcal{D}\)
+Let us define  \(\mathcal{D}\) as the observed PET TAC, \( \Theta = (\theta_{1}, \dots,\theta_{p}, \alpha_{1}, \beta_{1}, \dots, \alpha_{s}, \beta_{s}) \) as the set of unknown parameters describing the system, and consider an unknown Gaussian noise with variance of $\sigma^2$ present in the system.
+We seek to estimate the joint probability \(p(\Theta,\sigma^2\mid \mathcal{D})\) of the model parameters \(\Theta\) and noise level given the observed data \(\mathcal{D}\)
 
 According to the Bayes rule:
 \[
@@ -171,7 +172,8 @@ According to the Bayes rule:
 where  \(p(\Theta,\sigma^2 \mid \mathcal{D})\) is the posterior distribution, \(p(\mathcal{D} \mid \Theta,\sigma^2)\) is the likelihood, and $\pi(\Theta)$ and $\pi(\sigma^2)$ are the prior knowledge that we have on the set of parameters and the noise. Thus we can sample the posterior distribution by calculate the likelihood and having the priors.
 
 
-We can derive the observed data from the GTM response of the model \ref{TODO}. For convenience, we define
+We can derive the observed data from the GTM response of the model \ref{TODO}.
+For convenience, we define
 \[
 	\mathcal{T}(t) = \mathcal{G}(t;\Theta) =
 	\mathcal{G}\left(
@@ -200,7 +202,7 @@ The prior for the frequency and amplitude in SA was chosen as a reasonable unifo
 
 The prior distribution for the noise variance, $\pi(\sigma^2)$, is specified as an inverse-gamma distribution with hyperparameters $a_0$ and $b_0$ since inverse-gamma is the prior conjugate for the variance of a normal distribution
 \[
-    \pi(\sigma^2) \sim \Gamma^{-1}(a_0,b_0)
+	\pi(\sigma^2) \sim \Gamma^{-1}(a_0,b_0)
 \]
 
 In this work, the hyperparameters are selected so that $\pi(\sigma^2)$ is centered around an empirical estimate of the TAC variance, computed as the weighted root mean squared error between the observed carotid TAC and the mean AIF.
@@ -296,7 +298,7 @@ However, this accuracy heavily depends on describing the brain physical anatomy 
 Thus, as the input, PET-SORTEO requires the description and performance of a PET machine, a 3D emission numerical phantom segmenting the brain in to different emitting regions, a 3D attenuation numerical phantom describing the attenuation coefficient of the tissues, and lastly the Time Activity Curves in each emitting regions.
 
 For this study, we seek to replicate the \fdg$\,$ dataset again in the simulation.
-Thus we chose Biograph mMR scanner as the scanner and we took inspirations from the real MR and PET data to create our numerical phantoms and the TACs.
+Thus we chose the same Biograph mMR scanner as the real dataset and we took inspirations from the real MR and PET data to create our numerical phantoms and the TACs.
 
 Firstly, using the regional brain atlas of the subject, the sub-regions were merged to create larger regions of White Matter(WM), Gray Matter(GM), Gray Nuclei (GN), Cerebellar Gray Matter(CGM), and Cerebellar White Matter(CWM).
 An algorithm that was originally designed for creating pseudo CT from T1-weighted image for bone attenuation correction in PET reconstruction was used here to create masks for the bone \ref{TODO}.
