@@ -1,5 +1,6 @@
 \chapter{Introduction}
 \section{Positron Emission Tomography}
+% GPT: dont touch
 Positron Emission Tomography (PET) is an in vivo functional imaging technique widely used in clinical and research settings to monitor physiological and biochemical processes.
 In PET, a biologically active molecule is labeled with a positron-emitting radioisotope, serving as a radiotracer, and then injected into the body.
 As the radiotracer accumulates in target tissues, its radioactive decay produces positrons, which interact with electrons to emit pairs of gamma photons in nearly opposite directions.
@@ -18,6 +19,7 @@ Instead of a single snapshot, dynamic imaging produces time-activity curves (TAC
 This approach enables the measurement of physiological parameters such as the tracer rate of influx (\(K_i\)) for radiotracers with irreversible uptake (e.g. \fdg ), volume of distribution (\(V_T\)), and the rates of phosphorylation and dephosphorylation.
 
 \section{Kinetic Modeling}
+% GPT: dont touch
 To quantify pharmacokinetic parameters, kinetic modeling is employed.
 Compartmental modeling is the most popular and is considered the most accurate approach in kinetic modeling.
 In compartmental modeling, the distribution and kinetics of a radiotracer are described by dividing the system into distinct compartments, each representing a pool of tracer that behaves uniformly.
@@ -100,39 +102,47 @@ It is determined by inserting an arterial catheter into the patient and continuo
 However, this procedure is invasive and can cause discomfort, potentially discouraging patients from undergoing future examinations.
 Furthermore, this method is labor-intensive and requires trained personnel to manage both the subject and the measurement devices.
 
+\subsection{Population-Based Input Function}
+Population-Based Input Function (PBIF) is a method for replacing the subject specific AIF with the average AIFs of a population of other subjects.
+% GPT: explain a bit more, max 1-2 sentences
+
 \subsection{Image Derived Input Function}
 % GPT: Dont change
 The image-derived input function (IDIF) has been proposed as a non-invasive alternative for obtaining the input function.
 IDIF techniques typically involve identifying vascular structures or regions with high blood pool activity within the imaging field and extracting the input function directly from the PET images.
-In brain PET imaging, the carotid arteries are the largest vessels present in the limited field of view (FOV) and have a diameter of approximately 5 mm, which is comparable to the typical spatial resolution of PET (4-6mm FWHM).
-Therefore, directly extracting the carotids from PET images is challenging due to the limited resolution and the strong partial volume effects (PVE) present.
+For example, in whole-body, cardiac or small animal PET studies the aorta is visible in the in the Field of View (FOV) of the PET camera and is used as the source for IDIF.
+In brain PET imaging, the Internal Carotid Arteries (ICA) are the largest vessels present in the FOV and have a diameter of approximately 5 mm much smaller than of the aorta.
+Their smaller size makes IDIF more challenging due to Partial Volume Effects
 
-\subsection{Population-Based Input Function}
-Population-Based Input Function (PBIF) is a method for replacing the subject specifc AIF with the average AIFs of a population of other subjects.
-% GPT: explain a bit more, max 1-2 sentences
-
-\subsection{Background}
-Many methods have utilized the first few frames of the dynamic PET where tracer only exists in the arteries and has not reached other tissues yet, to perform a high intensity tresholding to obtain the mask of the carotids \cite{young2023image}.
-Due to PVE, these methods are not totally accurate therefore many different take clever approaches such as supervised clustering \cite{TODO}, Deep learning approaches \cite{TODO} and [TODO] \ref{TODO}
+\section{Partial Volume Effect}
+% GPT: explain PVE in a few lines. 
+Partial Volume Effect (PVE) is
 
 
 
+\section{Background}
+% GPT: improve sentencing and add slightly more description to some methods that i didnt explain enough
+Many methods have utilized the first few frames of the dynamic PET which the tracer has not reached tissues yet and mainly exists in the arteries, to obtain the mask of the carotids \cite{young2023image}.
+These implementation vary from completely manual \cite{TODO}, semi-automatic by just providing a few seed voxels for a region growing algorithm \cite{TODO} or for the center of a dilation, and completely automatic by using sophisticated deep learning methods such as custom Convolutional Neural Networks (CNN) \cite{TODO} and U-NET \cite{TODO}.
+
+However even with the sophisticated approaches, ICA segmentation directly from PET still suffer from the strong PVE present.
 With the emergence of hybrid PET/MRI machines, it has become feasible to acquire both functional and anatomical data simultaneously.
 MRI provides high-resolution soft tissue contrast, while PET captures metabolic activity.
-For instance, time-of-flight MR angiography (TOF-MRA) delivers excellent arterial contrast, which allows for accurate segmentation of vascular structures such as the carotid arteries.
-However, even with a high-resolution anatomical guidance, directly applying the segmented arterial mask to the PET images introduces challenges \cite{zanotti2011image}.
-In particular, the limited spatial resolution of PET can lead to partial volume effects, resulting in inaccuracies in the derived input function.
-Consequently, additional correction techniques are required to mitigate these effects and ensure reliable quantification.
+For instance, time-of-flight MR angiography (TOF-MRA) delivers excellent arterial contrast.
+Many methods have taken advantage of this fact to deliver simple yet very accurate segmentation of the ICA by manual or semi-automatic procedures usually involving high intensity thresholding or seeded or not-seeded region growing algorithms \cite{TODO}.
 
-Several methods have been developed to enhance IDIF accuracy by addressing partial volume correction and artery segmentation.
-PET-only methods aim to extract the artery from the PET image itself which is
+Unlike T1-weighted MRI, TOF-MRA is not usually available in studies thus \citeauthor{TODO} \cite{TODO} proposed a deep learning model to extract the ICA from the T1-weighted images.
+\cite{TODO} in the caliPER software enabled the semi-automatic extraction of the arteries from both TOF-MRA as well as T1-weighted images.
 
+However, as previously mentioned, even with a high-resolution anatomical mask of the arteries, the issue of PVE still exists and must be accounted for.
+Many Partial Volume Correction (PVC) methods involve in deriving the spill-in and spill-out coefficient of the ICA and the surrounding tissue.
+Recovery Coefficient (RC) is the most popular method of estimating the spill-in and spill-out coefficient \cite{TODO,TODO,TODO,TODO}.
+They are computed by scanning cylindrical phantoms of different diameters and matching the diameter of the ICA to them \cite{TODO}.
+Geometric Transfer Matrix (GTM) is a more general method adapted to any type of volume by estimating spillage coefficients by based on the geometry of the VOI and modelling the PSF of the PET\cite{TODO}.
+However, these methods do not account for the apparent noise in the PET and% GPT: add one more reason. like i wanna say its just a simple linear mixing like SP*C1-SO*C2   
+thus they fail to fully recover the lost signal due to noise.
 
-Several methods have been developed to enhance IDIF accuracy by addressing partial volume correction and automation challenges.
-For partial volume correction,
-Early PET-only approaches primarily focused on classical partial volume correction (PVC) techniques \cite{mourik2009image}, while more recent methods have explored supervised clustering algorithms \cite{lyoo2014image} and deep learning approaches \cite{chavan2024end,ferrante2024physically}.
-Hybrid PET/MRI methods improve carotid artery delineation by leveraging anatomical imaging. The caliPER software, for instance, employs a semi-automated approach for IDIF extraction using carotid masks obtained from T1 or TOF-MRA images, incorporating partial volume correction \cite{dassanayake2022caliper}.
-Additionally, fully automated methods have been proposed to enhance carotid segmentation and PVC techniques \cite{sari2017estimation, jochimsen2016fully, khalighi2018image, sundar2019towards}.
+More complex methods have been proposed such as model-based matrix factorization to estimate the input function and surrounding tissue activity \cite{TODO} and deep learning approaches \cite{TODO,TODO}
 
-\citeauthor{irace2021bayesian} \cite{irace2021bayesian} proposed an automatique method for IDIF estimation by performing TOF-MRA driven carotid segmentation and using a Bayesian framework for incorporating prior knowledge into a geometric transfer matrix method \cite{rousset1998correction}---a classical partial volume correction technique.
-In this work, the aim was to improve this method and enhance accuracy by evaluating it on a dataset of comatose patients.
+In this work, we propose a fully automatic pipeline for extracting the ICA mask from the TOF-MRA.
+We utilize a Bayesian framework to model the input function and the surrounding tissue based on their interaction according to GTM by incorporating prior knowledge and also accounting for noise \cite{irace2021bayesian}.
