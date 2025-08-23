@@ -1,43 +1,43 @@
 \chapter{Materials and Methods}
 
 \section{Dataset Description}
-Two experimental dataset were available.
-In the first study, 59 acute comatose patients were included between 7 days and 30 days after the coma onset (46 ± 16 years old; 21 females).
-PET data were acquired in list mode during 90 min from the injection of an intravenous bolus of \fdg.
-The second study, included 7 healthy subjects (25 ± 3 years old; all male) with injection of an intravenous bolus of \yohimbine.
+Two experimental datasets were available.
+In the first study, 59 acute comatose patients were included between 7 days and 30 days after coma onset (46 ± 16 years old; 21 females).
+PET data were acquired in list mode for 90 minutes following an intravenous bolus injection of \fdg.
+The second study included 7 healthy subjects (25 ± 3 years old; all male) who received an intravenous bolus of \yohimbine.
 
-Both dataset used the same exact following imaging protocol.
-Using a Siemens healthineers Biograph mMR simultaneous MR and PET machine, an arterial time-of-flight MR (TOF-MRA) in axial orientation, with a voxel size of 0.3$\times$0.3$\times$0.7 mm as well as a T1-weighted MRI in axial orientation, with isometric voxel size of 1mm were acquired during the 90 minute dynamic PET.
-Raw PET data were rebinned into 24-time frames (variable length frames : 8$\times$15 s, 3$\times$60 s, 5$\times$120 s, 1$\times$300 s, 7$\times$600 s) sinograms for dynamic reconstruction.
-Reconstruction yielded a voxel size of 1.04$\times$1.04$\times$2.08 mm$^3$ in a matrix of 344$\times$344$\times$127 voxels.
+Both datasets used the same imaging protocol.
+Using a Siemens Healthineers Biograph mMR simultaneous MR–PET system, an arterial time-of-flight MR angiography (TOF-MRA) was acquired in axial orientation with a voxel size of 0.3\(\times\)0.3\(\times\)0.7 mm, and a T1-weighted MRI was acquired in axial orientation with isotropic 1 mm voxels, during the 90-minute dynamic PET.
+Raw PET data were rebinned into 24 time frames (variable-length frames: 8\(\times\)15 s, 3\(\times\)60 s, 5\(\times\)120 s, 1\(\times\)300 s, 7\(\times\)600 s) sinograms for dynamic reconstruction.
+Reconstruction yielded a voxel size of 1.04\(\times\)1.04\(\times\)2.08 mm\(^3\) in a matrix of 344\(\times\)344\(\times\)127 voxels.
 
-In the \fdg$\,$ study, AIF in the whole blood and plasma were measured from 26 arterial blood samples manually collected (with the following timing: every 5 s for the first minute, every 15 s until second minute, and at times 3, 5, 10, 20, 30, 45, 60, 75, 80, 85 and 90 minutes post-injection) and counted with a gamma counter.  
-
-In the \yohimbine $\,$study, 25 arterial blood samples were manually collected (with the following timing: every 5 s for the first minute, every 10 s until second minute, and at times 5, 10, 30, 45, 60, and 90 minutes post-injection).
+In the \fdg\ study, whole-blood and plasma AIFs were measured from 26 manually collected arterial samples (timing: every 5 s for the first minute, every 15 s until the second minute, and at 3, 5, 10, 20, 30, 45, 60, 75, 80, 85, and 90 minutes post-injection) and counted in a gamma counter.
+In the \yohimbine\ study, 25 arterial blood samples were manually collected (timing: every 5 s for the first minute, every 10 s until the second minute, and at 5, 10, 30, 45, 60, and 90 minutes post-injection).
 % GPT: idk how to say the plasma fraction was calculated
-The blood samples were counted with a gamma counter and were centrifuged and the extracted plasma was counted again to calculate the plasma fraction [TODO correct this part]
-
-
+The blood samples were counted in a gamma counter, then centrifuged to separate plasma, and the plasma activity was measured to compute the plasma fraction as the ratio of plasma to whole-blood activity at each time point.
+%[TODO: confirm the exact laboratory procedure and any metabolite correction if applicable.]
 
 \section{Pre-processing}
-% GPT: justfix sentencing and phrasing  
-For both studies, the T1-weighted image was registered to both the average PET image and to the TOF-MRA image using a affine registration method.
-The two resulting affine transformation matrices were then combined to register the TOF-MRA directly to the PET.
-Even though in the \fdg $\,$ study, the patients were completely unconscious and the PET and MRI images were acquired simultaneously in the same session, this was still done out of an abundance of caution.
-The T1-weighted image was used as a medium since it has common spatial features with both the other two modalities and directly registering TOF-MRA to the PET would be impractical due to the low spatial resolution of the PET and the limited axial FOV of the TOF-MRA images.
-Lastly, the brain was segmented into regions of interest (ROI) based on the Hammersmith brain atlas \cite{hammers2003three}.
+% GPT: just  fix sentencing and phrasing
+For both studies, the T1-weighted image was registered to the average PET image and to the TOF-MRA using the NiftyReg program, an affine registration method \cite{TODO}.
+The two resulting affine transformation matrices were then composed to register the TOF-MRA directly to the PET space.
+Even though patients in the \fdg\ study were unconscious and PET and MRI were acquired simultaneously in the same session, we performed this step out of caution to eliminate the possibility of misregistration.
+The T1-weighted image served as an intermediary because it shares anatomical features with both modalities, whereas directly registering TOF-MRA to PET is impractical due to PET’s lower spatial resolution and the limited axial field-of-view of TOF-MRA.
+Finally, the brain in the T1-weighted image was segmented into regions of interest (ROIs) using the Hammersmith brain atlas \cite{hammers2003three} to obtain regional masks, and these masks were applied to the dynamic PET to extract regional TACs.
+
+
 \section{Carotid Segmentation\label{sec:carotid}}
-% GPT: improve sentencing 
-Figure~\ref{fig:seg_pipeline} shows the complete pipeline for the carotid segmentation.
-Since vessels appear as hypersignal in TOF-MRA, a high-intensity thresholding technique can be used to extract the arteries from the image.
-However, other tissues such asbrain lesion ---which were very common in the comatose dataset--- and venous structures may also appear as hypersignal and can interfere with the selection.  
-To exclude them, in a reference image, a cuboid volume of interest (VOI) was defined where the carotid arteries are most likely to appear (Step I).
-The threshold value was calculated as the 1\% percentile of all non-zero voxels in the image and then it was applied to only to the voxels inside the VOI (Step II).
-A 3D connectivity constraint was employed to the remaining voxels to extract all fully connected volumes and among those, the top 2 biggest were consider as the left and right internal carotid artery and extracted(Step III).
+% GPT: improve sentencing
+Figure~\ref{fig:seg_pipeline} summarizes the carotid segmentation pipeline.
+Because vessels appear hyperintense in TOF-MRA, a high-intensity threshold can extract arterial structures.
+However, lesions—which were common in the comatose cohort—and venous structures can also appear hyperintense, and may be inadvertently selected by thresholding.
+To exclude these, a cuboid volume of interest (VOI) was defined in a reference space to cover the anatomical region where the ICAs are most likely to appear (Step I).
+The threshold was set to the 1st percentile of all non-zero voxels in the image and applied only within the VOI (Step II).
+A 3D connected-components filter was then applied, and the two largest connected components were retained as the left and right internal carotid arteries (Step III).
 
 % GPT: fix sentencing
-The reference image used was the standard MNI152 atlas, which was padded by 50\% more voxels in the inferior direction of the brain (negative Z in voxel-space) since the original atlas excludes the area below the brain which is of the interest for us.
-The TOF-MRA image was then registered to the reference image using an affine registration technique and the obtained affine matrix was used to register and then apply the VOI to the TOF-MRA.
+The reference image was the standard MNI152 atlas, padded by 50\% in the inferior direction (negative \(z\) in voxel space) because the original atlas excludes the subcranial region relevant for the ICAs.
+The TOF-MRA was registered to this reference using an affine transformation, and the resulting matrix was used to map the VOI into TOF-MRA space before applying the thresholding and connectivity steps.
 
 \begin{figure}[h]
 	\centering
@@ -68,6 +68,7 @@ The TOF-MRA image was then registered to the reference image using an affine reg
 \end{figure}
 
 \section{Partial Volume Correction}
+
 \subsection{Geometric Transfer Matrix}
 % GPT: don't touch
 As we discussed before in \ref{TODO}, direct extraction of the radioactivity in the arteries is not practical due to PVC.
@@ -86,7 +87,7 @@ A mask for extracting the activities of the latter was obtained by dilating the 
 	=
 	\underbrace{
 		\begin{bmatrix}
-			\omega_{c \rightarrow c}& \omega_{bg \rightarrow c}  \\  
+			\omega_{c \rightarrow c}  & \omega_{bg \rightarrow c}  \\
 			\omega_{c \rightarrow bg} & \omega_{bg \rightarrow bg}
 		\end{bmatrix}
 	}_{\text{GTM}}
@@ -107,182 +108,173 @@ with \(\chi_n\) and \(\chi_m\) denoting the binary masks of regions \(n\) and \(
 
 $T_{c}$ and $T_{bg}$ are respectively the observed carotid and background TACs and $T_{IF}$ and $T_{tissue}$ are the real unknown TACs of the carotid (the input function) and the background tissue.
 
-By inverting the GTM, this system of equations can be easily solved and the "true" TAC in the artery and background be computed.
+By inverting the GTM, this system of equations can be solved to recover the arterial and background TACs.
 % GPT: correct sentencing and explaining
-However, GTM along with other classical PVE methods usually fail to fully recover the lost signal as they are a simplification that does not consider the whole picture particularly accounting for the time-variant noise experienced in the signal.
-This causes these methods to not only fail to correct the noise but end up amplifying them because of their assumptions.
-The time-variant noise can be attributed to number of contributing factors, namely, the small size of the arteries, very short frame-times at the beginning of the scan where the changes in the input function are very rapid and rapid decay of the radiotracer which in all result in low-count statistic hence having higher noise.
-
+However, GTM and other classical PVC methods often fail to fully recover the lost signal because they simplify the problem and ignore time-varying noise characteristics.
+As a result, they may propagate or even amplify noise.
+Time-varying noise arises from several factors, including the small diameter of the ICAs, very short early frames when the IF changes rapidly, and the exponential decay of the tracer, all of which reduce gamma counts detection by the PET camera and increase variance.
 
 \subsection{Bayesian Geometric Transfer Matrix}
+
 \subsubsection{Modelling}
 % GPT: improve sentencing
-For each subject, $T_{IF}$ is modeled as a linear combination of a population mean and its principal components derived by performing principal component analysis (PCA) on a set of arterial input functions (AIFs) collected from the population.
-Specifically, for each subject, a subset of 20 random subjects is selected from the dataset—excluding the subject under study—to construct the PCA model.
-The data are first zero-centered, and PCA is applied to extract the principal axes \(\phi_i(t)\) and their corresponding explained variances \(\lambda_i\).
-Each axis is then scaled by \(\sqrt{\lambda_i}\) to yield components \(v_i(t)\) with distribution of \(\mathcal{N}(0,1)\). The input function is then modeled as:
-
+For each subject, \(T_{IF}\) is modeled as a linear combination of a population mean and principal components obtained by applying principal component analysis (PCA) to AIFs from the cohort.
+Specifically, for each subject, a subset randomly selected subjects—excluding the subject under study—is used to build a PCA basis.
+After zero-centering the training AIFs, PCA yields principal axes \(\phi_i(t)\) with explained variances \(\lambda_i\).
+We define scaled components \(v_i(t) = \sqrt{\lambda_i}\,\phi_i(t)\), and write
 \begin{equation}
-	T_{IF}(t) = \mu(t) + \sum_{i=1}^p \theta_i\,v_i(t),
+	T_{IF}(t) = \mu_{IF}(t) + \sum_{i=1}^p \theta_i\,v_i(t),
 \end{equation}
-with
-\[
-	v_i(t) = \sqrt{\lambda_i}\,\phi_i(t),
-\]
-where $p$ is the number of components, \(\mu(t)\) is the population mean AIF, \(\phi_i(t)\) are the principal axes obtained from PCA, \(\lambda_i\) are their explained variances, and \(v_i(t)\) are the scaled components. Due to this scaling, the weighting coefficients \(\theta_i\) will have a distribution of \(\sim \mathcal{N}(0,1)\).
+where \(\mu_{IF}(t)\) is the population mean and the coefficients satisfy \(\theta_i \sim \mathcal{N}(0,1)\) by construction.
+Here, \(p\) denotes the number of retained components.
 
 % GPT: i dont like the sentencing and explanation at all
-Spectral Analysis (SA) has been proposed as a decomposition method for describing the tissue activity in dynamic PET.
-This method produces a spectrum of kinetic components by modelling the TACs as a convolution of the input function with a impulse response function \cite{TODO}.
+% Spectral Analysis (SA) describes tissue activity as a sum of exponential impulse responses convolved with the input function \cite{TODO}.
+% It represents a flexible, linear decomposition of kinetics without committing to a specific compartmental topology, which is helpful for background tissue surrounding the ICAs.
+%
+Spectral analysis (SA) models tissue activity as the convolution of the input function with an impulse response written as a sum of exponentials \cite{TODO}.
+This makes it more flexible and generalizable as it does not assume a particular compartment model and is convenient for describing background signal.
+Therefore, the background TAC is
 
-The impulse response function is considered as sum of multiple exponentials. Therefor the background TAC will be
-\[
-	T_{bg} = \sum_{i=1}^s \alpha_{i} \cdot T_{IF} \circledast e^{-\beta_{i} t}.
-\]
-Where $\circledast$ denotes the convolution operator, \(\alpha_i\) is the coefficient. and \(\beta_i\) is the frequency of the \(i\)th spectrum.
-
+\begin{equation}
+	T_{bg}(t) = \sum_{i=1}^s \alpha_{i} \,\bigl(T_{IF} \circledast e^{-\beta_{i} t}\bigr)(t),
+\end{equation}
+where \(\circledast\) denotes convolution, \(\alpha_i\) is the amplitude, and \(\beta_i\) is the decay rate of the \(i\)th spectral component.
 
 \subsubsection{Noise}
 % GPT: i dont like the sentencing and explanation at all
-Accurately modelling the noise is very challenging as there are numerous sources of them.
-Some sources of noise such as scattering effect, random events, and motion artifacts among others are corrected to some degree by the reconstruction program.
-However the biggest contributor of noise is "low-count statistics" which is caused by short time frames at the begin of the scan and by the exponential decay of the radioisotope towards the end of the scan apparent by the low dose of the tracer injection.
-This combined with the small size of the carotid introduces a massive challenge for recovering the lost signal.
+Accurate noise modeling is challenging because multiple sources contribute to the variance.
+Some effects (e.g. scatter, randoms, and motion) are partially corrected during reconstruction post-processing.
+The main contributor is low-count statistics, an inherent limitation of PET due to detector performance and overall camera sensitivity, which is particularly problematic for IDIF because the ICAs are small, early frames are very short during the bolus passage, and radioactive decay reduces detected events, increasing variance across frames.
 
-Noise in raw PET counts is considered to be a Poisson distribution however after the reconstruction process it is widely assumed to be a Gaussian distribution \cite{TODO}. To account for the previously mentioned time-variant noise, weights are used to normalize the noise along all frames to a single statistic. We define the weights as
-\[
-	\omega_{i} = \frac{\Delta t_i}{c_i} e^{\frac{-t_{i} ln(2)}{T_{1/2}}}
-\]
-where \(\omega_i\) is the weight, \(\Delta t_i\) is the frame duration, and \(c_i\) is the net-true counts detected by the PET camera at the \(i\)th frame and\(T_{1/2}\) is the half-life of the radioisotope.  
-However, \(c_i\) was substituted here with \(C_T(t_i)\), the total radioactivity concentration at the mid-time frame due to unavailability of these counts in our datasets.
+While raw PET counts are Poisson-distributed, post-reconstruction noise is typically approximated as Gaussian \cite{TODO}.
+To account for time-varying noise, we use per-frame weights to normalize variance across frames:
+\begin{equation}
+	\omega_{i} = \frac{\Delta t_i}{c_i}\,\exp\!\left(-\frac{t_{i}\,\ln 2}{T_{1/2}}\right),
+\end{equation}
+where \(\Delta t_i\) is the frame duration, \(c_i\) is the net true counts for frame \(i\), and \(T_{1/2}\) is the tracer half-life.
+Because \(c_i\) was unavailable, we substitute \(C_T(t_i)\), the total reconstructed activity concentration at the frame mid-time.
 
-The time-variant noise variances can be normalized as the weighted mean of the per frame variance.
-
-\[
-	\sigma^2= \frac{1}{N} \sum_{i=1}^{N} \omega_i \sigma_i^2.
-\]
-
+The time-varying noise level is summarized by a weighted average variance:
+\begin{equation}
+	\sigma^2 = \frac{1}{N} \sum_{i=1}^{N} \omega_i\,\sigma_i^2.
+\end{equation}
 
 \subsubsection{Estimation}
 % GPT: correct sentencing
-Let us define\(\mathcal{D}\) as the observed PET TAC, \( \Theta = (\theta_{1}, \dots,\theta_{p}, \alpha_{1}, \beta_{1}, \dots, \alpha_{s}, \beta_{s}) \) as the set of unknown parameters describing the system, and consider an unknown Gaussian noise with variance of $\sigma^2$ present in the system.  
-We seek to estimate the joint probability \(p(\Theta,\sigma^2\mid \mathcal{D})\) of the model parameters \(\Theta\) and noise level given the observed data \(\mathcal{D}\)
+Let \(\mathcal{D}\) denote the observed PET TAC, and let \( \Theta = (\theta_{1}, \dots,\theta_{p}, \alpha_{1}, \beta_{1}, \dots, \alpha_{s}, \beta_{s}) \) be the unknown model parameters, with an unknown Gaussian noise variance \(\sigma^2\).
+We aim to estimate the joint posterior \(p(\Theta,\sigma^2\mid \mathcal{D})\).
 
-According to the Bayes rule:
-\[
-	p(\Theta,\sigma^2 \mid \mathcal{D}) \propto p(\mathcal{D} \mid \Theta,\sigma^2) \cdot \pi( \Theta ) \cdot \pi( \sigma^2)
-\]
-where\(p(\Theta,\sigma^2 \mid \mathcal{D})\) is the posterior distribution, \(p(\mathcal{D} \mid \Theta,\sigma^2)\) is the likelihood, and $\pi(\Theta)$ and $\pi(\sigma^2)$ are the prior knowledge that we have on the set of parameters and the noise. Thus we can sample the posterior distribution by calculate the likelihood and having the priors.  
+By Bayes’ rule,
+\begin{equation}
+	p(\Theta,\sigma^2 \mid \mathcal{D}) \propto p(\mathcal{D} \mid \Theta,\sigma^2)\,\pi( \Theta )\,\pi( \sigma^2),
+\end{equation}
+where \(p(\mathcal{D} \mid \Theta,\sigma^2)\) is the likelihood and \(\pi(\cdot)\) are the priors.
+We can therefore sample the posterior once the likelihood and priors are obtained.
 
-
-We can derive the observed data from the GTM response of the model \ref{TODO}.
-For convenience, we define
-\[
+The observed data are linked to the latent TACs through GTM \ref{TODO}.
+For convenience, define
+\begin{equation}
 	\mathcal{T}(t) = \mathcal{G}(t;\Theta) =
-	\mathcal{G}\left(
+	\mathcal{G}\!\left(
 	\begin{bmatrix}
 			T_{IF}(t;\theta_{1}, \dots, \theta_{p}) \\
 			T_{tissue}(t;\alpha_{1}, \beta_{1}, \dots)
-		\end{bmatrix}\right)
-\]
-where $\mathcal{G}$ is the GTM model and $\mathcal{T}$ is the perceived activity based on the GTM model (effected by PVE). Since we considered the noise to be Gaussian, the likelihood would be
+		\end{bmatrix}\right),
+\end{equation}
+where \(\mathcal{G}\) is the GTM operator and \(\mathcal{T}\) is the predicted activity (after PVE).
+Assuming Gaussian noise with frame weights \(\omega_i\), the likelihood is
+\begin{equation}
+	p(\mathcal{D} \mid \Theta,\sigma^2) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi \sigma^2}} \exp\!\left( -\frac{\omega_i\,\bigl(\mathcal{D}(t_i) - \mathcal{T}(t_i)\bigr)^2}{2\sigma^2} \right).
+\end{equation}
+We refer to this framework as the Bayesian Geometric Transfer Matrix (Bayesian GTM or BGTM).
 
-\[
-	p(\mathcal{D} \mid \Theta,\sigma^2) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi \sigma^2}} \exp\left( -\frac{\omega_i(\mathcal{D}(t_i) - \mathcal{T}(t_i))^2}{2\sigma^2} \right).
-\]
-Hence from this point forward, we call this method as the Bayesian Geometric Transfer Matrix (Bayesian GTM or BGTM).
+The prior factorizes as
+\begin{equation}
+	\pi(\Theta) = \prod_{i=1}^p \pi(\theta_i)\,\prod_{j=1}^s \pi(\alpha_j)\,\pi(\beta_j).
+\end{equation}
+As noted above, \(\theta_i \sim \mathcal{N}(0,1)\).
+For the spectral parameters, we adopt broad uniform priors,
+\begin{equation}
+	\alpha_i,\beta_i \sim \mathcal{U}( u_{\text{min}} , u_{\text{max}} ).
+\end{equation}
 
-The prior of parameters can be expanded as
+For the noise variance, we use an inverse-gamma prior, \(\pi(\sigma^2) \sim \Gamma^{-1}(a_0,b_0)\), conjugate to the Gaussian likelihood.
+We center this prior around an empirical weighted mean squared deviation between the observed carotid TAC and the mean AIF:
+\begin{equation}
+	\mathbb{E}[X] = \frac{1}{N} \sum_{i=1}^{N} \omega_i\,\bigl(T_c(t_i) - \mu_{IF}(t_i)\bigr)^2.
+\end{equation}
+Given a chosen coefficient of variation (CV), we set
+\begin{equation}
+	a_0 = 2 + \frac{1}{\mathrm{CV}^2}, \qquad b_0 = (a_0 - 1)\,\mathbb{E}[X].
+\end{equation}
 
-\[
-	\pi(\Theta) = \prod_{i=1}^p \pi(\theta_i)\prod_{j=1}^s \pi(\alpha_j) \pi(\beta_j).  
-\]
-As mentioned before, the PCA weighting coefficients have a normal distribution of $\mathcal{N}(0,1)$ which is also used as their prior knowledge.
-The prior for the frequency and amplitude in SA was chosen as a reasonable uniform distribution range.
-\[
-	\alpha_i,\beta_i \sim \mathcal{U}( u_{\text{min}} , u_{\text{max}} )
-\]
-
-The prior distribution for the noise variance, $\pi(\sigma^2)$, is specified as an inverse-gamma distribution with hyperparameters $a_0$ and $b_0$ since inverse-gamma is the prior conjugate for the variance of a normal distribution
-\[
-	\pi(\sigma^2) \sim \Gamma^{-1}(a_0,b_0)
-\]
-
-In this work, the hyperparameters are selected so that $\pi(\sigma^2)$ is centered around an empirical estimate of the TAC variance, computed as the weighted root mean squared error between the observed carotid TAC and the mean AIF.
-
-\[
-	\mathbb{E}[X] = \frac{1}{N} \sum_{i=1}^{N} (T_c(t_i) - \mu(t_i))^2
-\]
-Thus by choosing an arbitrary Coefficient of Variation (CV), we will have
-\[
-	a_0 = 2 + \frac{1}{\mathrm{CV}^2}\, , \, b_0 = (a_0 - 1) \, \mathbb{E}[X]
-\]
 \subsubsection{Sampling}
-
 % GPT: correct sentencing
-Evaluating the posterior distribution \ref{TODO} directly is not feasible due to its complexity and lack of a closed-form solution.
-Thus we utilize a Monte-Carlo sampler to estimate the posterior distribution by taking sufficient random samples.
-In this work, we utilize a Markov Chain Monte-Carlo with a hybrid Metropolis-within-Gibbs sampling method.
+Direct evaluation of the posterior \ref{TODO} is intractable, so we employ Monte Carlo sampling.
+We use a Markov chain Monte Carlo scheme with a Metropolis-within-Gibbs strategy.
 
-The Gibbs sampler allows for separately drawing sample for each parameter one by one based on its univariate posterior conditional distribution $p(\Theta_i \mid \mathcal{D}, \Theta_{-i}, \sigma^2)$ for each $\Theta_i$ where $\Theta_{-i}$ is the parameter vector except $\Theta_i$ and $p(\sigma^2 \mid \mathcal{D},\Theta)$ for the $\sigma^2$.
+Gibbs updates draw each parameter from its univariate conditional posterior \(p(\Theta_i \mid \mathcal{D}, \Theta_{-i}, \sigma^2)\) and the noise variance from \(p(\sigma^2 \mid \mathcal{D},\Theta)\).
+Metropolis–Hastings proposals explore \(\Theta\): at iteration \(m\), propose \(\Theta_{i}^\prime = \Theta_{i}^{(m)} + \varepsilon_{i}\,b\), where \(\varepsilon_i\) is the step size and \(b\) is a Brownian perturbation.
+Accept with probability
+\begin{equation}
+	\min\!\left(1,\ \frac{p(\Theta_i^\prime \mid \mathcal{D}, \Theta_{-i}, \sigma^2)}{p(\Theta_i^{(m)} \mid \mathcal{D}, \Theta_{-i}, \sigma^2)}\right).
+\end{equation}
 
-By iteratively doing this, Gibbs sampling results in the desired multivariate conditional posterior distribution $p(\Theta,\sigma^2 \mid \mathcal{D})$.
+Because the inverse-gamma prior is conjugate, the conditional posterior for \(\sigma^2\) is also inverse-gamma,
+\begin{equation}
+	p(\sigma^2 \mid \mathcal{D},\Theta) \sim \Gamma^{-1}(a, b),
+\end{equation}
+with
+\begin{equation}
+	a = a_0 + \frac{N}{2}, \qquad b = b_0 + \frac{1}{2}\sum_{i=1}^{N} \omega_i\,\bigl(\mathcal{D}(t_i) - \mathcal{T}(t_i)\bigr)^2.
+\end{equation}
+Thus, \(\sigma^2\) can be sampled directly without Metropolis–Hastings.
 
-The exploration of the parameters $\Theta$ is done using the Metropolis-Hasting algorithm.
-In this algorithm, a new parameter is proposed based on slightly changing the previous sample.
-For example at the $m$th iteration in the chain, a new proposal for $\Theta_{i}^{(m)}$ is given as $\Theta_{i}^\prime = \Theta_{i}^{(m)} + \varepsilon_{i} \cdot b$, where $\varepsilon_{i}$ is the scaling factor or step-size and $b$ is a Brownian motion.
-The proposal is either accepted and is kept as the new sample or rejected and the parameter stays unchanged.
-The acceptance probability is given by
-\[
-	min\left(1,\frac{p(\Theta_i^\prime \mid \mathcal{D}, \Theta_{-i}, \sigma^2)}{p(\Theta_i^{(m)}\mid \mathcal{D}, \Theta_{-i}, \sigma^2)}\right)
-\]
-
-By choosing inverse-gamma for the noise prior which is conjugate prior, the posterior distribution is also a inverse-gamma distribution.
-
-\[
-	p(\sigma^2 \mid \mathcal{D},\Theta) \sim \Gamma^{-1}(a, b)
-\]
-where
-\[
-	a=a_0 + \frac{N}{2} \quad, b= b_0 + \sum_{i=0}^N \omega_i(\mathcal{D}(t_i) - \mathcal{T}(t_i))^2.
-\]
-Since we have a closed-form expression for the posterior distribution of the noise variance, we can just simply draw samples without the Metropolis-Hasting acceptance/rejection method.
-
-To ensure efficient exploration of the parameter space, each parameter \( k \) is assigned its own proposal step size \( \epsilon_k \).
-During the burn-in phase, these step sizes are adapted in blocks of \( L = 50 \) Metropolis–Hastings updates by monitoring the empirical acceptance rate for each parameter.
-If the acceptance rate for a parameter exceeds 0.5, its step size is increased by an arbitrary 10\% (\( \epsilon_k \leftarrow 1.1\,\epsilon_k \)); otherwise, it is decreased by 10\% (\( \epsilon_k \leftarrow 0.9\,\epsilon_k \)).
-This adaptive tuning continues until the end of the burn-in period, after which all step sizes are fixed and subsequent samples are retained.
+To improve mixing, each parameter \(k\) has its own proposal step size \(\epsilon_k\).
+During burn-in, step sizes are adapted every \(L=50\) Metropolis–Hastings updates by an arbitrary acceptance rate of 0.5: if the empirical rate exceeds 0.5, increase \(\epsilon_k \leftarrow 1.1\,\epsilon_k\); otherwise decrease \(\epsilon_k \leftarrow 0.9\,\epsilon_k\).
+After burn-in, step sizes are fixed and subsequent samples are retained.
 
 \subsubsection{Inference}
 % GPT: correct sentencing
-After sufficient sampling, we employ a modified Maximum a Posteriori (MAP) method by calculating the average parameters of the top 0.1\% samples with the highest posterior probability and considering it as the solution.
-
-
+After sufficient sampling, we use a modified maximum a posteriori (MAP) estimate by averaging the parameters of the top 0.1\% of samples ranked by posterior probability and reporting this average as the solution.
+\section{Plasma Fraction Correction}
+By construction, IDIFs extracted from PET represent whole-blood activity.
+For \fdg, plasma metabolites are generally negligible over the scan, so the whole-blood AIF was used without plasma or metabolite correction \cite{TODO}.
+For \yohimbine, kinetic modeling requires the plasma parent activity, so whole-blood IDIFs were converted to plasma and corrected for metabolites using
+\begin{equation}
+	C_{P,\mathrm{parent}}(t) \;=\; \frac{C_{WB,\mathrm{IDIF}}(t)}{R_{bp}} \,\times\, \mathrm{PPF}(t),
+\end{equation}
+where \(R_{bp}=0.661\) is the whole-blood–to–plasma ratio and \(\mathrm{PPF}(t)\) is the plasma parent fraction modeled as a 3 exponential curve:  \cite{TODO}
+\begin{equation}
+	\mathrm{PPF}(t) \;=\; 0.30\,e^{-t/0.88} \;+\; 0.09\,e^{-t/11.49} \;+\; 0.61\,e^{-t/65.77}.
+\end{equation}
+Because \(V_T\) estimation uses total plasma parent activity, no additional free-fraction correction was applied.
 
 \section{Evaluation}
+
 \subsection{IF Curves}
 % GPT: Don't touch
 The performance of the proposed IDIF estimation was first evaluated by computing the mean absolute error (MAE) between the cumulative area under the curve (cAUC) of the estimated IDIF and the \textit{ground true} AIF. cAUC was considered to be a more suitable metric since it provides an integrated measure of tracer exposure over time and is less sensitive to local fluctuations or noise in the curve compared to the directly comparing the TACs.
 \begin{equation}
-	\textrm{cAUC}(t) =\int_{0}^{t} IF(\tau) \, d\tau,  
+	\textrm{cAUC}(t) =  \int_{0}^{t} IF(\tau) \, d\tau,
 \end{equation}
 where \(IF\) is the input function.
 
 \subsection{Quantification}
 However, because the cAUC error does not fully capture the impact of IDIF deviations on kinetic parameters, absolute quantification was also performed to evaluate the performance of the estimated IDIF against the gold standard AIF.
-% GPT: fix sentencing
-This was achieved by utilizing an reversible and irreversible two-tissue compartment model (2TCM) via non-linear fitting respectively with the \texttt{fitk3} for the \fdg dataset and \texttt{fitk4} program for the \yohimbine dataset from the TPCCLIB library developed at the Turku PET Centre \cite{oikonen2018tpcclib}—applying the model fitting once with the IDIF and once with the AIF as the input function.
+Quantification was performed using graphical methods implemented in TPCCLIB \cite{oikonen2018tpcclib}.
+The Patlak plot was used for \fdg\ \cite{patlak1983graphical}, and the Logan plot for \yohimbine\ \cite{logan1990graphical}.
 
-The brain atlas was applied to the PET image and regional TACs were acquired by averaging voxels over time.
-For \fdg, the regional ($\mrglu$) was then calculated,
-The mean absolute percentage error (MAPE) of the \(\textrm{MR}_{glu}\) in each ROI was calculated and then averaged across the entire dataset:
+The brain atlas was applied to the PET image and regional TACs were obtained by averaging voxels over time.
+For \fdg, regional \(\mrglu\) was computed.
+The mean absolute percentage error (MAPE) of \(\textrm{MR}_{\textrm{glu}}\) in each ROI was then calculated and averaged across the dataset:
 \begin{equation}
-	\text{Average MAPE}(\mrglu)= \frac{100\%}{N} \sum_{i=1}^{N} \left( \frac{1}{N_{\text{ROI}}} \sum_{j=1}^{N_{\text{ROI}}} \left| \frac{\textrm{MR}_{\textrm{glu},ij}^{\textrm{IDIF}} - \textrm{MR}_{\textrm{glu},ij}^{\textrm{AIF}}}{\textrm{MR}_{\textrm{glu},ij}^{\textrm{AIF}}} \right| \right),
+	\text{Average MAPE}(\mrglu)= \frac{100}{N} \sum_{i=1}^{N} \left( \frac{1}{N_{\text{ROI}}} \sum_{j=1}^{N_{\text{ROI}}} \left| \frac{\textrm{MR}_{\textrm{glu},ij}^{\textrm{IDIF}} - \textrm{MR}_{\textrm{glu},ij}^{\textrm{AIF}}}{\textrm{MR}_{\textrm{glu},ij}^{\textrm{AIF}}} \right| \right),
 \end{equation}
-where $N$ is the number of subjects.
+where \(N\) is the number of subjects.
 
-Similarly, for \yohimbine, the Volume of Distribution ($V_T$) was calculated and the dataset error was calculated as
-
+Similarly, for \yohimbine, the volume of distribution (\(V_T\)) was calculated and the dataset error was computed as
 \begin{equation}
 	\mathrm{MAPE}(V_T)
 	= \frac{100}{N}
@@ -297,49 +289,107 @@ Similarly, for \yohimbine, the Volume of Distribution ($V_T$) was calculated and
 	\biggr).
 \end{equation}
 
-Additionally, linear least-squares regression was performed between the regional \(\mrglu\) and $V_T$ obtained by quantification with using AIF and IDIF for each subject. The coefficient of determination (\(R^2\)) and the regression slope (\(S\)) were obtained for each subject. The mean absolute errors of these metrics across the dataset are given by
+Additionally, linear least-squares regression was performed between the regional \(\mrglu\) and \(V_T\) obtained using AIF and IDIF for each subject.
+The coefficient of determination (\(R^2\)) and regression slope (\(S\)) were computed per subject.
+The mean absolute percentage errors of these metrics across the dataset are
 \begin{equation}
-	\text{MAE}(R^2) = \frac{1}{N} \sum_{i=1}^{N} \left| R^2_i - 1 \right|
+	\text{MAPE}(R^2) = \frac{100}{N} \sum_{i=1}^{N} \left| R^2_i - 1 \right|
 \end{equation}
 and
 \begin{equation}
-	\text{MAE}(S) = \frac{1}{N} \sum_{i=1}^{N} \left| S_i - 1 \right|,
+	\text{MAPE}(S) = \frac{100}{N} \sum_{i=1}^{N} \left| S_i - 1 \right|,
 \end{equation}
-where $N$ is the number of subjects and \(R^2_i\) and \(S_i\) denote the coefficient of determination and the regression slope for subject \(i\), respectively.
+where \(R^2_i\) and \(S_i\) denote the coefficient of determination and slope for subject \(i\), respectively.
 
 \section{Simulation}
-% GPT: fix coherence and sentencing 
-PET simulations are an integral part of the validation of statistical and analytical PET methods as they have the advantage of knowing the exact ground truth which is not always available or might be effected by human error or instrumental malfunction.
-In the previous section, we considered the AIF to be the gold standard and the ground truth and the evaluation was done by comparing the method to it.
-But since the AIF is taken and analysed manually and involves multiple devices and processes operated by different personnels (machine operators, nurses, and biochemists) at different steps, there is a large possibility for mistakes.
+% GPT: fix coherence and sentencing
+PET simulations are integral to validating statistical and analytical PET methods because they provide ground truth that may be unavailable or affected by human or instrumental error in experimental data.
+In the previous section, we treated the AIF as the ground truth and evaluated methods against it.
+However, because AIF measurement and analysis involve multiple manual steps and devices operated by different personnel, errors can occur.
 
-For this reason, as a complementary validation step to the experimental datasets, simulations were conducted and the method will be evaluated on them as well.
+Therefore, as a complementary validation, we conducted realistic simulations and evaluated the method on these data as well.
+PET-SORTEO is a Monte Carlo PET simulation platform \cite{TODO} whose accuracy has been validated repeatedly \cite{TODO,TODO} and can closely approximate real acquisitions.
+This fidelity strongly depends on accurate descriptions of both the physical anatomy and tracer kinetics.
 
-PET-SORTEO is a realistic Monte-Carlo PET simulation platform which its accuracy has been validated numerous times \ref{TODO} and for that reason can be considered as close to a real PET acquisition.
-However, this accuracy heavily depends on describing the brain physical anatomy and the tracer's biochemical processes in the tissue.
+As input, PET-SORTEO requires the description and characteristics of the PET machine, a 3D emission phantom segmenting the tissues into emitting regions, a 3D attenuation phantom describing tissue attenuation coefficients, and TACs for each emitting region.
+For this study, we simulated the \fdg\ dataset using the Biograph mMR model to mirror the experimental datasets, and we derived numerical phantoms and TACs from the real MR and PET data.
 
-Thus, as the input, PET-SORTEO requires the description and performance of a PET machine, a 3D emission numerical phantom segmenting the brain in to different emitting regions, a 3D attenuation numerical phantom describing the attenuation coefficient of the tissues, and lastly the Time Activity Curves in each emitting regions.
+For each subject, first, the brain atlas subregions were merged into larger regions: white matter (WM), gray matter (GM), gray nuclei (GN), cerebellar gray matter (CGM), and cerebellar white matter (CWM).
+An algorithm originally developed for pseudo-CT generation from T1-weighted MRI for bone attenuation correction was used to create masks for the extracerebral regions\cite{TODO}.
+Values above 300 were labeled as bone (BONE) and values between \(-300\) and \(300\) after excluding the brain as extracerebral soft tissues (SOFT) which includes the scalp, neck muscles, glands, eyes, etc.
+The leftover space between the skull and the brain was labeled as cerebrospinal fluid (CSF).
+Finally, the arterial mask (ICA) was obtained from the TOF-MRA segmentation (Section~\ref{sec:carotid}).
+These nine regions were combined to form the emission phantom.
 
-For this study, we seek to replicate the \fdg$\,$ dataset again in the simulation.
-Thus we chose the same Biograph mMR scanner as the real dataset and we took inspirations from the real MR and PET data to create our numerical phantoms and the TACs.
+The attenuation phantom was generated from the pseudo-CT by segmenting SOFT and BONE and assigning their respective attenuation coefficients.
 
-Firstly, using the regional brain atlas of the subject, the sub-regions were merged to create larger regions of White Matter(WM), Gray Matter(GM), Gray Nuclei (GN), Cerebellar Gray Matter(CGM), and Cerebellar White Matter(CWM).
-An algorithm that was originally designed for creating pseudo CT from T1-weighted image for bone attenuation correction in PET reconstruction was used here to create masks for the bone \ref{TODO}.
-Values above 300 were considered as the bone (BONE) and values between -300 and 300 were considered as Extra-cerebral Soft Tissues (SOFT) --- after subtracting the brain---which includes the scalp, neck muscles, glands, eyes, etc.
-The left over area between the skull and the brain was considered as the Cerebrospinal fluid (CSF).
-And lastly, from the segmentation of TOF-MRA \ref{TODO section}, the mask of the artery (ICA) was obtained.
-And lastly, the 9 different regions were overlapped together to create the final emission phantom.
+The emission phantom was then registered to PET space to extract subject-specific TACs.
+These TACs were corrected for PVE using GTM and subsequently fitted with a 2TCM to denoise and obtain "ideal" TACs.
+The AIF used for fitting was the subject’s measured AIF, itself fitted to an exponential model to remove noise \cite{feng}.
 
-The attenuation phantom was again created from the pseudo-CT by segmenting the scan in to SOFT and BONE and filling them with their respective attenuation coefficients.
+Several practical considerations were applied.
+Our SOFT definition is broad; while adequate for simulation, it violates homogeneity assumptions in compartment modeling, so the unfitted TAC was retained for SOFT.
+The pseudo-CT algorithm was permissive for BONE, leading to overestimated BONE TACs due to spill-in; empirically, BONE activity was scaled by 0.5.
 
-The resulting emission phantom was then registered to the PET space to extract TACs from the PET scan of the subject.
-The TACs were then corrected for PVE by GTM.
-The partial volume corrected TACs were then fitted to a (2TCM) to remove any possible noise and to achieve a so-called "perfect" TACs.
-The AIF used in the fitting was also the real AIF of the subject that was fitted to a exponential model for the same reason\ref{feng}.
-A few consideration were still taken in to account.
-Namely, our definition of SOFT tissue is very broad and although it is sufficient for the purpose of simulation, it breaks the rule of homogeneity required for compartment modelling thus the raw unfitted TAC was kept for this specific region.
-The pseudo-CT generation algorithm was very permissive in its definition of the BONE thus the resulting TAC was higher than reality since signal from the brain and the scalp was leaked in to it.
-So it was empirically decided that the value of the BONE should be halved.
-The CSF region is very narrow at points therefor it is heavily effected by PVE so GTM fails to correct for it.
-So the CSF TAC was considered to be 0.2 of the fitted WM TAC.
+Extracting the correct activity of the CSF with this approach is not feasible since it's a very thin region which is heavily affected by PVE. Thus, CSF TAC was considered 0.2 of the fitted WM TAC.
+% The CSF is very thin in places and heavily affected by PVE, and GTM fails to correct it. Thus, CSF TAC was set to 0.2 of the fitted WM TAC.
 
+\begin{tikzpicture}[
+		node distance=1cm and 2cm,
+		auto,
+		>=Stealth,
+		mybox/.style={draw, rounded corners, rectangle, minimum width=2cm, minimum height=1cm, align=center}
+	]
+
+	\node[mybox,minimum width=3cm] (pet) {PET};
+	\node[mybox,minimum width=3cm, below=of pet] (t1) {T1w MRI};
+	\node[anchor=south east] at($(pet.north)+(0,0.5)$) (pet_image) {\includegraphics[height=3cm]{figures/real_pet.png}};
+	\node[right=0.1cm of pet_image] (t1_image) {\includegraphics[height=3cm]{figures/t1.png}};
+
+
+	\node[mybox, right=5cm of pet, minimum width=3cm] (ttac) {Tissue Activity};
+	\node[mybox, right=5cm of t1, minimum width=3cm] (phantom) {Anatomical\\Phantom};
+
+	\node[anchor=south east] at($(ttac.north)+(0,0.5)$) (phantom_image) {\includegraphics[height=3cm]{figures/phantom.png}};
+	\node[right=0cm of phantom_image] (ttac_image) {\includegraphics[height=2cm]{figures/ttacs.png}};
+
+	\node[mybox, below=1.5cm of phantom, minimum width=3.3cm] (proto) {Simulation \\ Description Protocol};
+	\node[below=0.5cm of proto] (phantom_image) {\includegraphics[height=3cm]{figures/simulation_input_pet.png}};
+
+	\node[mybox, below=1.7cm of t1, minimum width=3cm] (simpet) {Simulated PET};
+	\node[below=0.5cm of simpet] (phantom_image) {\includegraphics[height=3cm]{figures/simulated_pet.png}};
+
+	\draw[->]
+	(pet.east) to[out=0, in=180]
+	node[yshift=+2pt, above] {\textit{Compartmental Fitting}}
+	node[yshift=-2pt, below] {\textit{\& PVC}}
+	(ttac.west);
+
+	\draw[->]
+	(t1.east) to[out=0, in=180]
+	node[yshift=+2pt, above] {\textit{Tissue}}
+	node[yshift=-2pt, below] {\textit{Classification}}
+	(phantom.west);
+
+	\draw[->] (ttac.east) to[out=0, in=0] (proto.east);
+
+	\draw[->] (phantom.east) to[out=0, in=0] (proto.east);
+
+	\draw[->]
+	(proto.west) to[out=180, in=0]
+	node[yshift=+2pt, above] {\textit{Monte Carlo}}
+	node[yshift=-2pt, below] {\textit{Simulation}}
+	(simpet.east);
+
+	\begin{pgfonlayer}{background}
+		\draw[dashed, rounded corners, thick]
+		($(pet.north west)+(-0.3,0.3)$) rectangle ($(t1.south east)+(0.3,-0.3)$);
+	\end{pgfonlayer}
+	\node at ($(t1.south)-(0,0.5)$) {\text{Real Life Data}};
+
+	\begin{pgfonlayer}{background}
+		\draw[dashed, rounded corners, thick]
+		($(ttac.north west)+(-0.3,0.3)$) rectangle ($(phantom.south east)+(0.3,-0.3)$);
+	\end{pgfonlayer}
+	\node at ($(phantom.south)-(0,0.5)$) {\text{Ground Truth}};
+\end{tikzpicture}

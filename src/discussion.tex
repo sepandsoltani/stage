@@ -9,12 +9,12 @@ This also disabled us from accurately evaluating the proposed IDIF algorithm, as
 With labeled data, deep learning approaches such as U-Net can also be explored to improve segmentation accuracy \cite{ronneberger2015u}.
 
 
-The cAUC error reduction (Figure~\ref{subfig:cauc_boxplot}) confirms Bayesian priors effectively constrain AIF estimates to physiological ranges.
+The cAUC error reduction (Figure~\ref{subfig:fdg_cauc_boxplot}) confirms Bayesian priors effectively constrain AIF estimates to physiological ranges.
 The strong correlation between cAUC errors and quantification errors (Figure~\ref{fig:corr_mat}) validates cAUC as a robust intermediate metric for IDIF assessment, enabling rapid validation without requiring full kinetic modeling.
 
 Quantitative analysis revealed strong agreement between BGTM and AIF-derived $\mrglu$ values, with the Bayesian approach achieving a 57\% reduction in absolute error compared to conventional GTM methods (Table~\ref{tab:metrics}).
 Despite this improvement, the observed MAPE results exhibited substantial dispersion (Coefficient of Variation = 71\%).
-This inconsistency is particularly evident in outlier cases where BGTM underperformed (Figure~\ref{fig:ifs}).
+This inconsistency is particularly evident in outlier cases where BGTM underperformed (Figure~\ref{fig:fdg_ifs}).
 Although, further investigation is required to fully characterize the underlying causes, one plausible factor could be TOF-MRA/PET misregistration resulting in inaccurate TAC extraction.
 
 

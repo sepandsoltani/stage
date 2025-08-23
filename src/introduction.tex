@@ -1,4 +1,5 @@
 \chapter{Introduction}
+
 \section{Positron Emission Tomography}
 % GPT: dont touch
 Positron Emission Tomography (PET) is an in vivo functional imaging technique widely used in clinical and research settings to monitor physiological and biochemical processes.
@@ -15,7 +16,7 @@ Due to its simplicity, static PET is widely used in clinical settings; however, 
 Because it reflects only one time point, the SUV cannot capture the temporal dynamics of tracer uptake and clearance, and various physiological factors may influence its measurements, thereby reducing its accuracy.
 
 Dynamic PET imaging provides a more comprehensive view of radiotracer kinetics by acquiring a series of images over a period ranging from a few minutes to more than an hour post-injection, depending on the tracer type.
-Instead of a single snapshot, dynamic imaging produces time-activity curves (TACs) that illustrate how tracer concentration in each tissue changes throughout the scanning period.
+Instead of a single snapshot, dynamic imaging produces time-activity curves (TAC) that illustrate how tracer concentration in each tissue changes throughout the scanning period.
 This approach enables the measurement of physiological parameters such as the tracer rate of influx (\(K_i\)) for radiotracers with irreversible uptake (e.g. \fdg ), volume of distribution (\(V_T\)), and the rates of phosphorylation and dephosphorylation.
 
 \section{Kinetic Modeling}
@@ -88,13 +89,14 @@ For \yohimbine $\,$ quantification, we utilize the Volume of Distribution ($V_T$
 	V_T = \frac{C_T}{C_P}
 \]
 
-Using the Logan plot method this can be directly estimated from these two values or to be fitted to a compartment model. In the latter case, $V_T$ can be calculated as
+Using the Logan plot method this can be directly estimated from these two values or to be fitted to a compartment model.
+In the latter case, $V_T$ can be calculated as
 \[
 	V_T = \frac{K_1}{k_2} (1+\frac{k_3}{k_4})
 \]
 
-
 \section{Input Function}
+
 \subsection{Arterial Input Function}
 % GPT: Dont change
 The arterial input function (AIF) is considered the gold standard for obtaining the input function.
@@ -105,6 +107,8 @@ Furthermore, this method is labor-intensive and requires trained personnel to ma
 \subsection{Population-Based Input Function}
 Population-Based Input Function (PBIF) is a method for replacing the subject specific AIF with the average AIFs of a population of other subjects.
 % GPT: explain a bit more, max 1-2 sentences
+In practice, an average curve is derived from a representative cohort and then temporally aligned and scaled to the subject using one or more calibration points (e.g., early blood samples or image-derived peaks).
+PBIF can reduce invasiveness and acquisition burden, but it may introduce bias if the cohort is not well matched to the subject or if calibration is suboptimal.
 
 \subsection{Image Derived Input Function}
 % GPT: Dont change
@@ -115,34 +119,40 @@ In brain PET imaging, the Internal Carotid Arteries (ICA) are the largest vessel
 Their smaller size makes IDIF more challenging due to Partial Volume Effects
 
 \section{Partial Volume Effect}
-% GPT: explain PVE in a few lines. 
+% GPT: explain PVE in a few lines.
 Partial Volume Effect (PVE) is
+the loss and mixing of signal that occurs when structures are small relative to the system’s spatial resolution, causing activity to “spill out” of small objects and “spill in” from neighbors.
+In PET, this leads to systematic underestimation of arterial activity and contamination from surrounding tissue, especially for vessels like the ICA that have similiar size as the effective resolution of PET camera (both around 5mm).
+In Figure~\ref{TODO}, this effect is shown [TODO]
+Correcting PVE is essential for accurate IDIF estimation and downstream kinetic modeling.
 
-
-
+\includegraphics[width=\textwidth]{figures/pve.jpg}
 \section{Background}
 % GPT: improve sentencing and add slightly more description to some methods that i didnt explain enough
-Many methods have utilized the first few frames of the dynamic PET which the tracer has not reached tissues yet and mainly exists in the arteries, to obtain the mask of the carotids \cite{young2023image}.
-These implementation vary from completely manual \cite{TODO}, semi-automatic by just providing a few seed voxels for a region growing algorithm \cite{TODO} or for the center of a dilation, and completely automatic by using sophisticated deep learning methods such as custom Convolutional Neural Networks (CNN) \cite{TODO} and U-NET \cite{TODO}.
+Many methods have utilized the first few frames of the dynamic PET, when the tracer has not yet reached tissue and predominantly resides in the arteries, to obtain a mask of the carotids \cite{young2023image}.
+These implementations range from fully manual approaches \cite{TODO}, to semi-automatic methods that use a few seed voxels for region growing or to initialize morphological operations \cite{TODO}, and to fully automatic pipelines based on deep learning such as custom Convolutional Neural Networks (CNNs) \cite{TODO} and U-Net architectures \cite{TODO}.
 
-However even with the sophisticated approaches, ICA segmentation directly from PET still suffer from the strong PVE present.
-With the emergence of hybrid PET/MRI machines, it has become feasible to acquire both functional and anatomical data simultaneously.
-MRI provides high-resolution soft tissue contrast, while PET captures metabolic activity.
+However, even with sophisticated approaches, ICA segmentation directly from PET suffers from strong PVE.
+With the emergence of hybrid PET/MRI systems, it has become feasible to acquire both functional and anatomical data simultaneously.
+MRI provides high-resolution soft-tissue contrast, while PET captures metabolic activity.
 For instance, time-of-flight MR angiography (TOF-MRA) delivers excellent arterial contrast.
-Many methods have taken advantage of this fact to deliver simple yet very accurate segmentation of the ICA by manual or semi-automatic procedures usually involving high intensity thresholding or seeded or not-seeded region growing algorithms \cite{TODO}.
+Many studies have leveraged this to achieve accurate ICA segmentation using manual or semi-automatic procedures, typically relying on high-intensity thresholding and seeded or unseeded region growing \cite{TODO}.
 
-Unlike T1-weighted MRI, TOF-MRA is not usually available in studies thus \citeauthor{TODO} \cite{TODO} proposed a deep learning model to extract the ICA from the T1-weighted images.
-\cite{TODO} in the caliPER software enabled the semi-automatic extraction of the arteries from both TOF-MRA as well as T1-weighted images.
 
-However, as previously mentioned, even with a high-resolution anatomical mask of the arteries, the issue of PVE still exists and must be accounted for.
-Many Partial Volume Correction (PVC) methods involve in deriving the spill-in and spill-out coefficient of the ICA and the surrounding tissue.
-Recovery Coefficient (RC) is the most popular method of estimating the spill-in and spill-out coefficient \cite{TODO,TODO,TODO,TODO}.
-They are computed by scanning cylindrical phantoms of different diameters and matching the diameter of the ICA to them \cite{TODO}.
-Geometric Transfer Matrix (GTM) is a more general method adapted to any type of volume by estimating spillage coefficients by based on the geometry of the VOI and modelling the PSF of the PET\cite{TODO}.
-However, these methods do not account for the apparent noise in the PET and% GPT: add one more reason. like i wanna say its just a simple linear mixing like SP*C1-SO*C2   
-thus they fail to fully recover the lost signal due to noise.
+Unlike T1-weighted MRI, TOF-MRA is not always included in research and clinical protocols.
+Meanwhile, T1-weighted scans are routinely acquired for anatomical localization and image registration, among other purposes, which makes them a practical source for arterial segmentation when TOF-MRA is not part of the protocol.
+In this context, \citeauthor{TODO} \cite{TODO} proposed a deep learning model that infers the ICA directly from T1-weighted images.
+Similarly, the caliPER software \cite{TODO} enables semi-automatic extraction of arterial masks from either TOF-MRA or T1-weighted data.
 
-More complex methods have been proposed such as model-based matrix factorization to estimate the input function and surrounding tissue activity \cite{TODO} and deep learning approaches \cite{TODO,TODO}
 
-In this work, we propose a fully automatic pipeline for extracting the ICA mask from the TOF-MRA.
-We utilize a Bayesian framework to model the input function and the surrounding tissue based on their interaction according to GTM by incorporating prior knowledge and also accounting for noise \cite{irace2021bayesian}.
+As noted above, even with a high-resolution anatomical arterial mask, PVE remains and must be corrected.
+Partial Volume Correction (PVC) methods estimate spill-in and spill-out coefficients between the ICA and surrounding tissue.
+Recovery Coefficients (RC) are commonly used, obtained by scanning cylindrical phantoms of various diameters and matching the ICA diameter to the closest phantom \cite{TODO,TODO,TODO,TODO}.
+The Geometric Transfer Matrix (GTM) method generalizes this by estimating regional spillover based on volume geometry and an explicit point spread function (PSF) model \cite{TODO}.
+However, these linear mixing models do not account for additional effects such as time-varying noise or motion, and they typically treat the problem as a fixed linear unmixing (\(\text{SP}\cdot C_{\text{in}} - \text{SO}\cdot C_{\text{out}}\)) without propagating uncertainty, which can limit recovery in challenging conditions.
+
+More advanced approaches include model-based matrix factorization that jointly estimates the input function and tissue activity \cite{TODO}, as well as deep learning methods trained to infer the IDIF from PET and MRI inputs \cite{TODO,TODO}.
+
+In this work, we propose a fully automatic pipeline for extracting the ICA mask from TOF-MRA.
+We then employ a Bayesian framework that couples GTM-based mixing with priors on the input function and tissue kinetics, explicitly modeling noise to improve IDIF estimation \cite{irace2021bayesian}.
+
