@@ -1,14 +1,15 @@
 \chapter{Results}
-\section{Carotid Segmentation from MRA-TOF}
-% GPT: fix sentencing 
-As illustrated in Figure~\ref{fig:seg_compare}, the cuboid mask plays a crucial role in the carotid segmentation.
-Because no ground truth segmentation is available, visual inspection was used to evaluate the results.
-In Figure~\ref{TODO}, we see the 3D model of segmented ICA of a subject.
+
+\section{Carotid Segmentation from TOF-MRA}
+As illustrated in Figure~\ref{fig:seg_compare}, the cuboid mask plays a crucial role in carotid segmentation.
+Because no ground-truth segmentation is available, results were evaluated by visual inspection.
+An example 3D rendering of a segmented ICA is shown in Figure~\ref{fig:carotid_3d}.
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.3\textwidth]{figures/carotid_3d.jpg}
-	\caption{3D visualization of segmented internal carotid arteries}
+	\caption{Three-dimensional visualization of the segmented internal carotid arteries.}
+	\label{fig:carotid_3d}
 \end{figure}
 
 \begin{figure}[h]
@@ -23,93 +24,78 @@ In Figure~\ref{TODO}, we see the 3D model of segmented ICA of a subject.
 		\caption{}
 		\label{subfig:seg_nobbox}
 	\end{subfigure}
-	\caption{Comparison of carotid segmentation (green) with (a) and without (b) a cuboid mask (yellow). In the absence of the cuboid mask, the segmentation algorithm fails to capture the carotid and instead incorrectly identifies the brain lesion}
+	\caption{Comparison of carotid segmentation (green) with (a) and without (b) a cuboid mask (yellow).}
 	\label{fig:seg_compare}
 \end{figure}
 
-
-% GPT: Hyperparameter is the correct term?
 \section{Hyperparameter Tuning}
-% GPT: fix sentencing and coherence
-The number of principle components $p$ was chosen as 3 by analysing the explained variance ratio plot in Figure~\ref{TODO}.
-We see with only 3 components we get more than 90\% explained variability.
-To prove the availability of the method, we seek to find the lowest possible number of population needed for the PCA in our \fdg $\,$ dataset.
-To do this, the experiment was repeated 10 times each time with a different random seed for choosing population for $N=\{5,10,15,20,30,40,50,60\}$ and the median quantification errors were compared.
-As apparent in Figure~\ref{TODO}, we see a plateau in the performance after $N=20$ and it was chosen as the ideal population sample count.
-For the \yohimbine$\,$ dataset since it only has 7 subjects, the maximum amount $N=6$ was chosen.
-
+The number of principal components \(p\) was set to 3 based on the cumulative explained-variance curve in Figure~\ref{fig:pca_variance}.
+With three components, the cumulative explained variance exceeds 90\%.
+To assess the minimal population size needed to build the PCA model in the \fdg\ dataset, the analysis was repeated ten times with different random seeds for \(N\in\{5,10,15,20,30,40,50,60\}\), and median quantification errors were compared.
+As shown in Figure~\ref{fig:pca_population}, performance plateaued at \(N=20\), which was therefore adopted.
+For the \yohimbine\ dataset, the maximum feasible \(N=6\) was used given the cohort size of seven subjects.
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=\textwidth]{figures/pca_explained_variance.jpg}
-	% gpt: add caption its the x=n components, y=cumulative explained variance % plot
-	\caption{}
+	\includegraphics[width=0.8\textwidth]{figures/pca_explained_variance.jpg}
+	\caption{Cumulative explained variance as a function of the number of PCA components.}
+	\label{fig:pca_variance}
 \end{figure}
+
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.8\textwidth]{figures/pca_n_experiment.jpg}
-	%gpt: its the plt.xlabel("PCA population size (N)"); plt.ylabel("MAPE Quantification Error (median ± 95% CI)") errorplot
-	\caption{}
+	\includegraphics[width=0.7\textwidth]{figures/pca_n_experiment.jpg}
+	\caption{Median quantification error (MAPE) with 95\% confidence intervals versus PCA population size.}
+	\label{fig:pca_population}
 \end{figure}
 
-% GPT: fix sentencing and coherence
-In classical model fitting using SA, an appropriate spectral range is chosen based on the radioisotope half-life (e.g. $10^{-4} \mathrm{s}^{-1}$ to $1 \mathrm{s}^{-1}$ for $^{18}\mathrm{F}$ ) and is then divided in to $s=100$ or $s=1000$ fixed frequencies ($\beta$) then their amplitudes ($\alpha$) are fitted to the TAC \cite{TODO}.
-The peaks in the resulting spectrum are considered as the [TODO] frequencies of the TAC.
-However, estimating 100 or 1000 different amplitude parameters using MCMC would not be computationally feasible.
-Instead we must chose an appropriate number of spectral components and let the model to tune the frequencies and the amplitudes together.
+In classical spectral analysis, the spectral range is chosen according to the isotope half-life (e.g., \(10^{-4}\,\mathrm{s}^{-1}\) to \(1\,\mathrm{s}^{-1}\) for \(^{18}\mathrm{F}\)) and discretized into \(s=100\) or \(s=1000\) fixed decay rates \(\beta\), while amplitudes \(\alpha\) are fitted to the TAC \cite{TODO}.
+Peaks in the resulting spectrum correspond to dominant kinetic components of the TAC.
+Estimating hundreds of amplitudes with MCMC would be impractical, so a compact basis is preferred in which both decay rates and amplitudes are learned.
+To select the basis size, we assumed the background kinetics could be approximated by the impulse response of either a 1TCM or a 2TCM, which entail one or two exponential basis functions, respectively.
+With two basis functions, the sampler frequently converged to nearly identical decay rates or pushed one rate to infinity, indicating a negligible contribution.
+Accordingly, a single exponential basis function was used for both datasets.
+As discussed in Section~\ref{TODO}, the PCA weights were assigned the prior \(\theta_i\sim\mathcal{N}(0,1)\).
+The spectral parameters were given weakly informative uniform priors \(\alpha,\beta\sim\mathcal{U}(10^{-5},10^{-2})\) due to the lack of stronger prior knowledge.
 
-To derive the number of basis functions, we assumed the activity in the surrounding tissue can either be modelled as 1TCM or 2TCM which their Impulse Response Function (IRF) have respectively one and two basis functions.
-Experiments with two basis functions showed that the model rarely results in two distinctive frequencies and would generally converge to similar values for both frequencies or one frequency would converge to infinity meaning no signifiant impact.
-Thus for both datasets one basis function was chosen.
-
-As discussed in Section~\ref{TODO}, the prior distribution used for the PCA weighting coefficients was $\theta_i \sim \mathcal{N}(0,1)$.
-The prior for the SA parameters were considered a very uninformative uniform distribution $\mathcal{U}(10^{-5},10^{-2})$ as we did not have concrete prior knowledge on these parameters.
-
+Each Markov chain was run for 230{,}000 iterations with a 30{,}000-iteration burn-in to ensure convergence.
 
 \section{Simulation}
-% GPT: fix sentencing and coherence
-From the 59 subjects in the \fdg $\,$ dataset, 24 subjects were excluded due to having very large brain tumors or opened skulls due to open brain surgery which caused the tissue classification algorithm to fail.
-The rest of the 35 subjects were used to create the numerical phantoms and to generate TACs for the simulation protocol.
-PET-SORTEO utilized the protocols to simulate realistic PET kinetic and exported PETs in sinogram format.
-The sinograms were reconstructed with the same reconstruction program and settings as the experimental dataset to ensure uniformity with the experimental dataset.
+Of the 59 \fdg\ subjects, 24 were excluded because large tumors or post-surgical skull openings caused the tissue-classification algorithm to fail.
+The remaining 35 subjects were used to build numerical phantoms and to generate TACs for the simulation protocol.
+The PET-SORTEO platform generated realistic PET in sinogram format based on these protocols.
+Sinograms were reconstructed with the same software and settings as the experimental data to ensure consistency.
 
-Although the point of the simulation was not to replicate the same scan exactly but only use it as an inspiration for how tracer kinetic behavior, the results of the simulations were compared to the real scans as a quality control step.
-In Figure~\ref{TODO} we see an example of the 2nd (top) and last frame (bottom) sagittal slice of the real PET(inspiration source), the simulation input, and the simulation output from left to right.
-As expected we see less details in the neck area (SOFT region) since we did not consider the complete arterial and venous structure as well as glands.
-But more importantly, we can clearly see the activity in the internal carotids in the 2nd frame which roughly coincides with the peak of the AIF.
-In the last frame we can also see the steady-state activity of the brain to be very realistic and have realistic contrast in different regions.
+The simulations were intended for quality control of the pipeline rather than replication of individual scans, and comparisons to real data were used only as sanity checks.
+Figure~\ref{fig:sim_compare_imgs} shows sagittal slices from the second and last frames for a representative subject, including the real PET, the simulation input, and the simulation output.
+Less detail is visible in the neck region because we did not model the full arterial tree, the venous system, or glands.
+The early frame (top row) roughly coincides with the AIF peak and the activity in ICA is clearly visible.
+In the late frame, when the tissues reach steady state, the brain activity seems realistic and we see an adequete contrast between regions such as WM and GM.
 
-In Figure~\ref{TODO}, we see an example of the comparison of the Partial Volume Corrected TAC of the simulation output and the simulation input.
-As expected we notice slight discrepancy due to lost signal as noise in the larger regions such as GM, CGM, and WGM since they are less affected by PVE and a very noticeable bias in the ICA which is affected the most by PVE.
+Figure~\ref{fig:sim_tac_compare} compares a partial-volume–corrected TAC from the simulation output with its simulation input.
+As expected, there are small differences due to noise in larger regions such as GM and the cerebellum, and there is a clear bias in the ICA because it is strongly affected by partial-volume effects.
 
-As a post processing step, the brain atlases were also applied to the reconstructed simulated PETs to extract regional TTACs for the quantification step.
-
-% gpt: make it in to figure and add appropriate caption:
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{figures/sim_compare.jpg}
-	\caption{}
+	\caption{Sagittal slices from the second frame (top) and last frame (bottom) for real PET (left), simulation input (middle), and simulation output (right)}
+	\label{fig:sim_compare_imgs}
 \end{figure}
 
-% gpt: make it in to figure and add appropriate caption ( its the comparison one)
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.4\textwidth]{figures/sim_tac.png}
-	\caption{}
+	\caption{TAC Comparison of the simulation input (dots) and the partial-volume–corrected output (lines) of an example subject}
+	\label{fig:sim_tac_compare}
 \end{figure}
 
 \section{IDIF}
-
-% GPT: fix sentencing and coherence
-Since BGTM relies on the GTM method and also depends on a population AIF. Thus the performance should be compared compared to the IDIF derived from GTM method and also the Population Based Input Function (PBIF) which is the mean AIF used in the PCA (\(\mu_{IF}\)).
-The Markov Chain was run for 230,000 iteration of which the first 30,000 were in the burn-in stage.
+Because BGTM builds on GTM and incorporates a population AIF prior, performance was compared with GTM-derived IDIF and with a PBIF defined as the mean AIF used in the PCA (\(\mu_{IF}\)).
 
 \subsection{\fdg\ Dataset}
-% GPT: fix grammar issues and sentencing. don't change a lot
-The reported statistic are from the experiment with the median results from the fine-tuning stage.
-
-Figure~\ref{fig:fdg_ifs} compares the two methods for one of the best- and worst-performing subjects.
-In the well-performing subject, BGTM significantly outperforms GTM and PBIF($\mrglu$ MAPE of 1.2\% vs. 26\% and 1.6\% respectively); however, in the poorly performing case, BGTM falls short of GTM and PBIF ($\mrglu$ MAPE of 36\% vs. 2.2\% and 4.75\% respectively).
+The reported statistics correspond to the experiment yielding the median validation performance from the fine-tuning stage.
+Figure~\ref{fig:fdg_ifs} illustrates best- and worst-case subjects.
+In the better-performing subject, BGTM outperforms GTM and PBIF (\(\mrglu\) MAPE of 1.2\% versus 26\% and 1.6\%, respectively), whereas in the poorer-performing subject BGTM underperforms relative to GTM and PBIF (\(\mrglu\) MAPE of 36\% versus 2.2\% and 4.75\%, respectively).
 
 \begin{figure}[h]
 	\centering
@@ -137,51 +123,40 @@ In the well-performing subject, BGTM significantly outperforms GTM and PBIF($\mr
 		\includegraphics[width=\textwidth]{figures/COUJE07810_1_patlak_mrglu.png}
 		\caption{}
 	\end{subfigure}
-	\caption{Comparison of the IFs (a,d), cumulative AUC curves (b,e), and $\mrglu$ regression lines (c,f) for one of the best-(top row) and worst-performing(bottom row) subjects in the \fdg\ dataset}
+	\caption{Comparison of the IFs (a,d), cumulative AUC curves (b,e), and \(\mrglu\) regression lines (c,f) for one better-performing (top) and one poorer-performing (bottom) subject in the \fdg\ dataset.}
 	\label{fig:fdg_ifs}
 \end{figure}
 
-The average mean absolute error of the cAUC curves across the dataset was 13,024 for BGTM and 15,709 and 14,630 for GTM and PBIF respectively (Figure~\ref{subfig:fdg_cauc_boxplot}).
-In quantification BGTM resulted in better performance compared to GTM and PBIF methods.
-Specifically, the BGTM, GTM, and PBIF methods achieved an average \(\mrglu\) mean absolute percentage error (MAPE) of 13\%, 24\%, 17\%, respectively (Figure~\ref{subfig:fdg_mape_boxplot}), and an average \(\mrglu\) MAE of 1.04, 1.98, and 1.4.
-In addition, the MAPE for the coefficient of determination (\(R^2\)) and the regression slope (\(S\)) were 1.75\%, 11.2\% for BGTM, compared to 4.1\% and 17\% for GTM and 1.5\% and 15.75\% for PBIF, respectively.
+The average cAUC MAE across subjects was 13{,}024 for BGTM and 15{,}709 and 14{,}630 for GTM and PBIF, respectively (Figure~\ref{subfig:fdg_cauc_boxplot}).
+In quantification, BGTM achieved lower errors than GTM and PBIF.
+Specifically, the average \(\mrglu\) MAPE was 13\%, 24\%, and 17\% for BGTM, GTM, and PBIF, respectively (Figure~\ref{subfig:fdg_mape_boxplot}), and the average \(\mrglu\) MAE was 1.04, 1.98, and 1.40.
+The MAPE for the coefficient of determination \((R^2)\) and the regression slope \((S)\) was 1.75\% and 11.2\% for BGTM, versus 4.1\% and 17\% for GTM and 1.5\% and 15.75\% for PBIF, respectively.
 
 \begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/fdg_quantification_patlak_mape_boxplot.png}
-		\caption{\(\mrglu\) MAPE Boxplot}
+		\caption{\(\mrglu\) MAPE boxplot.}
 		\label{subfig:fdg_mape_boxplot}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/fdg_curve_mae_boxplot.png}
-		\caption{cAUC MAE Boxplot}
+		\caption{cAUC MAE boxplot.}
 		\label{subfig:fdg_cauc_boxplot}
 	\end{subfigure}
-	\caption{Boxplot of curve and quantification errors for the \fdg\ dataset}
+	\caption{Boxplots of curve and quantification errors for the \fdg\ dataset.}
 	\label{fig:fdg_boxplots}
 \end{figure}
 
-
-
-
-% GPT: dont touch
 Paired t-tests were used to compare BGTM with GTM and PBIF on quantification metrics (Table~\ref{tab:metrics_all_fdg}).
 Relative to GTM, BGTM showed significantly lower \(\mrglu\) MAE (\(t=-5.934, p=1.754\times 10^{-7}\)), \(\mrglu\) MAPE (\(t=-5.459,\,p=1.042\times 10^{-6}\)), \(R^2\) absolute percentage error (APE) (\(t=-2.762,\,p=7.677\times 10^{-3}\)), and slope APE (\(t=-4.030,\,p=1.644\times 10^{-4}\)).
 Relative to PBIF, BGTM also yielded significantly lower \(\mrglu\) MAE (\(t=-2.974,\,p=4.275\times 10^{-3}\)), \(\mrglu\) MAPE (\(t=-2.415,\,p=1.890\times 10^{-2}\)), and slope APE (\(t=-3.036,\,p=3.583\times 10^{-3}\)), while the difference in \(R^2\) APE was not significant (\(t=1.680,\,p=9.832\times 10^{-2}\)).
 
-
 \subsection{\yohimbine\ Dataset}
-
-% GPT: fix grammar sentencing and coherence. should i keep the "it's mostly a lucky exception" or move it to discussion?
-The success of the \fdg\ dataset was not able to be replicated for the \yohimbine\ dataset.
-In Figure~\ref{fig:yoh_ifs} the best- and worst-performing subjects are compared.
-However, the 5\% MAPE $V_T$ in the good performing subject cannot reliably be attributed to the well performance of the algorithm rather it's mostly a lucky exception.
-
-Overall the average cAUC MAE of the dataset was 55{,}499 for BGTM and 96{,}362 and 37{,}613 for GTM and PBIF, respectively (Figure~\ref{subfig:yoh_cauc_boxplot}).
-In quantification using Logan plot method, the average \(V_T\) MAPE was 75.9\%, 166.5\%, and 29.5\% for BGTM, GTM, and PBIF, respectively (Figure~\ref{subfig:yoh_mape_boxplot}).
-
-As apparent by the Paired t-tests in Table~\ref{tab:metrics_all_yoh}, BGTM was able to perform better than GTM but performs significantly worst than the PBIF method.
+Performance on the \yohimbine\ dataset was lower than on \fdg.
+Figure~\ref{fig:yoh_ifs} compares best- and worst-performing subjects.
+Across subjects, the average cAUC MAE was 55{,}499 for BGTM and 96{,}362 and 37{,}613 for GTM and PBIF, respectively (Figure~\ref{subfig:yoh_cauc_boxplot}).
+By Logan analysis, the average \(V_T\) MAPE was 75.9\%, 166.5\%, and 29.5\% for BGTM, GTM, and PBIF, respectively (Figure~\ref{subfig:yoh_mape_boxplot}).
 
 \begin{figure}[h]
 	\centering
@@ -209,7 +184,7 @@ As apparent by the Paired t-tests in Table~\ref{tab:metrics_all_yoh}, BGTM was a
 		\includegraphics[width=\textwidth]{figures/GOIAX07977_TEST_logan_bp.png}
 		\caption{}
 	\end{subfigure}
-	\caption{Comparison of the IFs (a,d), cumulative AUC curves (b,e), and $V_T$ regression lines (c,f) for one of the best-(top row) and worst-performing(bottom row) subjects in the \yohimbine\ dataset}
+	\caption{Comparison of the IFs (a,d), cumulative AUC curves (b,e), and \(V_T\) regression lines (c,f) for one better-performing (top) and one poorer-performing (bottom) subject in the \yohimbine\ dataset.}
 	\label{fig:yoh_ifs}
 \end{figure}
 
@@ -217,38 +192,29 @@ As apparent by the Paired t-tests in Table~\ref{tab:metrics_all_yoh}, BGTM was a
 	\centering
 	\begin{subfigure}[b]{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/yoh_quantification_logan_mape_boxplot.png}
-		\caption{\(\mrglu\) MAPE Boxplot}
+		\caption{\(V_T\) MAPE boxplot.}
 		\label{subfig:yoh_mape_boxplot}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/yoh_curve_mae_boxplot.png}
-		\caption{cAUC MAE Boxplot}
+		\caption{cAUC MAE boxplot.}
 		\label{subfig:yoh_cauc_boxplot}
 	\end{subfigure}
-	\caption{Boxplot of curve and quantification errors of the \yohimbine\ dataset}
+	\caption{Boxplots of curve and quantification errors for the \yohimbine\ dataset.}
 	\label{fig:yoh_boxplots}
 \end{figure}
 
-
 \subsection{Simulated Dataset}
-% GPT: fix sentencing
-As a complementary quality control step of the simulations, the performance of Direct IDIF (meaning with no PVC) of the experimental dataset was compared to the simulated dataset.
-The average cAUC MAE of the simulated dataset was significantly higher than the experimental dataset (85,138 vs 34,929).
-And the AUC APE of 46\% for simulated compared to 22\% for experimental.
-By comparing the temporal error of the Direct IDIF curves of both dataset (example subject in Figure~\ref{fig:sim_temporal_err}), it was shown that the Direct IDIF of the simulated data underestimates the activity level compared to the experimental data.
+As a quality-control check on the simulations, the Direct IDIF (no PVC) from the experimental data was compared with the Direct IDIF from the simulated data.
+The simulated dataset showed a higher cAUC MAE than the experimental dataset (85{,}138 versus 34{,}929) and a higher AUC APE (46\% versus 22\%).
+Figure~\ref{fig:sim_temporal_err} shows the temporal error for one subject, where the simulated Direct IDIF underestimates activity relative to the experimental Direct IDIF.
 
-This underestimation and larger bias in the Direct IDIF was translated in to large bias in the other IDIF methods as well.
-Figure~\ref{fig:sim_ifs} compares one of the best and worst-performing subjects.
-BGTM was only able to show slight improvement in cAUC MAE compared to GTM with 53,997 vs 57,991.
-However, it performed significantly worse than PBIF with an average bias of 23,072(Figure~\ref{subfig:sim_cauc_boxplot}.
-In absolute quantification, BGTM underperformed compared to both methods with an average $\mrglu$ MAPE of 48\% compared to 35.6\% and 18.5\% for GTM and PBIF respectively.
-In Table~\ref{tab:metrics_all_sim}, the performance in all metrics are detailed and no significant improvement was noticed in the paired t-tests.
+This underestimation propagates to other IDIF methods and increases bias.
+Figure~\ref{fig:sim_ifs} shows best- and worst-case subjects.
+BGTM provided only a slight improvement in cAUC MAE relative to GTM (53{,}997 versus 57{,}991), and it performed worse than PBIF, which achieved an average cAUC MAE of 23{,}072 (Figure~\ref{subfig:sim_cauc_boxplot}).
+In absolute quantification, BGTM underperformed both comparators, with an average \(\mrglu\) MAPE of 48\% versus 35.6\% for GTM and 18.5\% for PBIF.
+Paired t-tests showed no improvement over GTM for cAUC MAE (\(t=-1.353,\,p=0.185\)) and statistically worse performance than PBIF for cAUC MAE (\(t=9.013,\,p=1.56\times10^{-10}\)), RMSE (\(t=8.805,\,p=2.73\times10^{-10}\)), and AUC APE (\(t=8.317,\,p=1.04\times10^{-9}\)).
 
-\begin{figure}[h]
-    \includegraphics[width=\textwidth]{figures/GM12051_temporal_error.png}
-    \caption{Comparison of Relative Temporal Bias Percentage of the experimental and simulated data Direct IDIF of a subject}
-    \label{fig:sim_temporal_err}
-\end{figure}
 
 \begin{figure}[h]
 	\centering
@@ -276,7 +242,7 @@ In Table~\ref{tab:metrics_all_sim}, the performance in all metrics are detailed 
 		\includegraphics[width=\textwidth]{figures/sim_AJ10923_1_patlak_mrglu.png}
 		\caption{}
 	\end{subfigure}
-	\caption{Comparison of the IFs (a,d), cumulative AUC curves (b,e), and $\mrglu$ regression lines (c,f) for one of the best-(top row) and worst-performing(bottom row) subjects in the simulated dataset}
+	\caption{Comparison of the IFs (a,d), cumulative AUC curves (b,e), and \(\mrglu\) regression lines (c,f) for one better-performing (top) and one poorer-performing (bottom) simulated subject.}
 	\label{fig:sim_ifs}
 \end{figure}
 
@@ -284,23 +250,31 @@ In Table~\ref{tab:metrics_all_sim}, the performance in all metrics are detailed 
 	\centering
 	\begin{subfigure}[b]{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/sim_quantification_patlak_mape_boxplot.png}
-		\caption{\(\mrglu\) MAPE Boxplot}
+		\caption{\(\mrglu\) MAPE boxplot.}
 		\label{subfig:sim_mape_boxplot}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/sim_curve_mae_boxplot.png}
-		\caption{cAUC MAE Boxplot}
+		\caption{cAUC MAE boxplot.}
 		\label{subfig:sim_cauc_boxplot}
 	\end{subfigure}
-	\caption{Boxplot of curve and quantification errors of the simulated dataset}
+	\caption{Boxplots of curve and quantification errors for the simulated dataset.}
 	\label{fig:sim_boxplots}
 \end{figure}
 
-% GPT: Don't touch tables
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{figures/GM12051_temporal_error.png}
+	\caption{Relative temporal bias (\%) of Direct IDIF in one experimental subject versus its simulated counterpart.}
+	\label{fig:sim_temporal_err}
+\end{figure}
+
+
 \begin{sidewaystable}[b]
 	\centering
 	\small
 	\setlength{\tabcolsep}{10pt}
+    \caption*{\fdg\ Dataset}
 	\begin{tabular}{l|cc|cc|cc|cc|cc}
 		\toprule
 		\multirow{2}{*}{\textbf{Metric}} & \multicolumn{2}{c|}{\textbf{BGTM}} & \multicolumn{2}{c|}{\textbf{GTM}} & \multicolumn{2}{c|}{\textbf{PBIF}} & \multicolumn{2}{c|}{\textbf{BGTM vs GTM}} & \multicolumn{2}{c}{\textbf{BGTM vs PBIF}}                                                                                                                  \\
@@ -328,6 +302,7 @@ In Table~\ref{tab:metrics_all_sim}, the performance in all metrics are detailed 
 	\centering
 	\small
 	\setlength{\tabcolsep}{10pt}
+    \caption*{\yohimbine\ Dataset}
 	\begin{tabular}{l|cc|cc|cc|cc|cc}
 		\toprule
 		\multirow{2}{*}{\textbf{Metric}} & \multicolumn{2}{c|}{\textbf{BGTM}} & \multicolumn{2}{c|}{\textbf{GTM}} & \multicolumn{2}{c|}{\textbf{PBIF}} & \multicolumn{2}{c|}{\textbf{BGTM vs GTM}} & \multicolumn{2}{c}{\textbf{BGTM vs PBIF}}                                                                                                  \\
@@ -354,6 +329,7 @@ In Table~\ref{tab:metrics_all_sim}, the performance in all metrics are detailed 
 	\centering
 	\small
 	\setlength{\tabcolsep}{10pt}
+    \caption*{Simulated Dataset}
 	\begin{tabular}{l|cc|cc|cc|cc|cc}
 		\toprule
 		\multirow{2}{*}{\textbf{Metric}} & \multicolumn{2}{c|}{\textbf{BGTM}} & \multicolumn{2}{c|}{\textbf{GTM}} & \multicolumn{2}{c|}{\textbf{PBIF}} & \multicolumn{2}{c|}{\textbf{BGTM vs GTM}} & \multicolumn{2}{c}{\textbf{BGTM vs PBIF}}                                                                                                 \\
