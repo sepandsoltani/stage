@@ -4,6 +4,13 @@
 As illustrated in Figure~\ref{fig:seg_compare}, the cuboid mask plays a crucial role in the carotid segmentation.
 Because no ground truth segmentation is available, visual inspection was used to evaluate the results.
 In Figure~\ref{TODO}, we see the 3D model of segmented ICA of a subject.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.3\textwidth]{figures/carotid_3d.jpg}
+	\caption{3D visualization of segmented internal carotid arteries}
+\end{figure}
+
 \begin{figure}[h]
 	\centering
 	\begin{subfigure}{0.45\textwidth}
@@ -20,11 +27,6 @@ In Figure~\ref{TODO}, we see the 3D model of segmented ICA of a subject.
 	\label{fig:seg_compare}
 \end{figure}
 
-\begin{figure}[t]
-	\centering
-	\includegraphics[width=0.4\textwidth]{figures/carotid_3d.jpg}
-	\caption{3D visualization of segmented internal carotid arteries}
-\end{figure}
 
 % GPT: Hyperparameter is the correct term?
 \section{Hyperparameter Tuning}
@@ -37,13 +39,13 @@ As apparent in Figure~\ref{TODO}, we see a plateau in the performance after $N=2
 For the \yohimbine$\,$ dataset since it only has 7 subjects, the maximum amount $N=6$ was chosen.
 
 
-\begin{figure}[t]
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{figures/pca_explained_variance.jpg}
 	% gpt: add caption its the x=n components, y=cumulative explained variance % plot
 	\caption{}
 \end{figure}
-\begin{figure}[t]
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=0.8\textwidth]{figures/pca_n_experiment.jpg}
 	%gpt: its the plt.xlabel("PCA population size (N)"); plt.ylabel("MAPE Quantification Error (median ± 95% CI)") errorplot
@@ -83,10 +85,18 @@ As expected we notice slight discrepancy due to lost signal as noise in the larg
 As a post processing step, the brain atlases were also applied to the reconstructed simulated PETs to extract regional TTACs for the quantification step.
 
 % gpt: make it in to figure and add appropriate caption:
-\includegraphics[width=\textwidth]{figures/sim_compare.jpg}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{figures/sim_compare.jpg}
+	\caption{}
+\end{figure}
 
 % gpt: make it in to figure and add appropriate caption ( its the comparison one)
-\includegraphics[width=0.6\textwidth]{figures/sim_tac.png}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.4\textwidth]{figures/sim_tac.png}
+	\caption{}
+\end{figure}
 
 \section{IDIF}
 
@@ -132,12 +142,11 @@ In the well-performing subject, BGTM significantly outperforms GTM and PBIF($\mr
 \end{figure}
 
 The average mean absolute error of the cAUC curves across the dataset was 13,024 for BGTM and 15,709 and 14,630 for GTM and PBIF respectively (Figure~\ref{subfig:fdg_cauc_boxplot}).
-
 In quantification BGTM resulted in better performance compared to GTM and PBIF methods.
 Specifically, the BGTM, GTM, and PBIF methods achieved an average \(\mrglu\) mean absolute percentage error (MAPE) of 13\%, 24\%, 17\%, respectively (Figure~\ref{subfig:fdg_mape_boxplot}), and an average \(\mrglu\) MAE of 1.04, 1.98, and 1.4.
 In addition, the MAPE for the coefficient of determination (\(R^2\)) and the regression slope (\(S\)) were 1.75\%, 11.2\% for BGTM, compared to 4.1\% and 17\% for GTM and 1.5\% and 15.75\% for PBIF, respectively.
 
-\begin{figure}
+\begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/fdg_quantification_patlak_mape_boxplot.png}
@@ -174,7 +183,7 @@ In quantification using Logan plot method, the average \(V_T\) MAPE was 75.9\%, 
 
 As apparent by the Paired t-tests in Table~\ref{tab:metrics_all_yoh}, BGTM was able to perform better than GTM but performs significantly worst than the PBIF method.
 
-\begin{figure}[p]
+\begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{0.322\textwidth}
 		\includegraphics[width=\textwidth]{figures/LUCAU08056_TEST_infunc.png}
@@ -204,7 +213,7 @@ As apparent by the Paired t-tests in Table~\ref{tab:metrics_all_yoh}, BGTM was a
 	\label{fig:yoh_ifs}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/yoh_quantification_logan_mape_boxplot.png}
@@ -220,6 +229,72 @@ As apparent by the Paired t-tests in Table~\ref{tab:metrics_all_yoh}, BGTM was a
 	\label{fig:yoh_boxplots}
 \end{figure}
 
+
+\subsection{Simulated Dataset}
+% GPT: fix sentencing
+As a complementary quality control step of the simulations, the performance of Direct IDIF (meaning with no PVC) of the experimental dataset was compared to the simulated dataset.
+The average cAUC MAE of the simulated dataset was significantly higher than the experimental dataset (85,138 vs 34,929).
+And the AUC APE of 46\% for simulated compared to 22\% for experimental.
+By comparing the temporal error of the Direct IDIF curves of both dataset (example subject in Figure~\ref{fig:sim_temporal_err}), it was shown that the Direct IDIF of the simulated data underestimates the activity level compared to the experimental data.
+
+This underestimation and larger bias in the Direct IDIF was translated in to large bias in the other IDIF methods as well.
+Figure~\ref{fig:sim_ifs} compares one of the best and worst-performing subjects.
+BGTM was only able to show slight improvement in cAUC MAE compared to GTM with 53,997 vs 57,991.
+However, it performed significantly worse than PBIF with an average bias of 23,072(Figure~\ref{subfig:sim_cauc_boxplot}.
+In absolute quantification, BGTM underperformed compared to both methods with an average $\mrglu$ MAPE of 48\% compared to 35.6\% and 18.5\% for GTM and PBIF respectively.
+In Table~\ref{tab:metrics_all_sim}, the performance in all metrics are detailed and no significant improvement was noticed in the paired t-tests.
+
+\begin{figure}[h]
+    \includegraphics[width=\textwidth]{figures/GM12051_temporal_error.png}
+    \caption{Comparison of Relative Temporal Bias Percentage of the experimental and simulated data Direct IDIF of a subject}
+    \label{fig:sim_temporal_err}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.322\textwidth}
+		\includegraphics[width=\textwidth]{figures/sim_CHAAB07833_1_infunc.png}
+		\caption{}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.322\textwidth}
+		\includegraphics[width=\textwidth]{figures/sim_CHAAB07833_1_cauc.png}
+		\caption{}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.322\textwidth}
+		\includegraphics[width=\textwidth]{figures/sim_CHAAB07833_1_patlak_mrglu.png}
+		\caption{}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.322\textwidth}
+		\includegraphics[width=\textwidth]{figures/sim_AJ10923_1_infunc.png}
+		\caption{}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.322\textwidth}
+		\includegraphics[width=\textwidth]{figures/sim_AJ10923_1_cauc.png}
+		\caption{}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.322\textwidth}
+		\includegraphics[width=\textwidth]{figures/sim_AJ10923_1_patlak_mrglu.png}
+		\caption{}
+	\end{subfigure}
+	\caption{Comparison of the IFs (a,d), cumulative AUC curves (b,e), and $\mrglu$ regression lines (c,f) for one of the best-(top row) and worst-performing(bottom row) subjects in the simulated dataset}
+	\label{fig:sim_ifs}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/sim_quantification_patlak_mape_boxplot.png}
+		\caption{\(\mrglu\) MAPE Boxplot}
+		\label{subfig:sim_mape_boxplot}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/sim_curve_mae_boxplot.png}
+		\caption{cAUC MAE Boxplot}
+		\label{subfig:sim_cauc_boxplot}
+	\end{subfigure}
+	\caption{Boxplot of curve and quantification errors of the simulated dataset}
+	\label{fig:sim_boxplots}
+\end{figure}
 
 % GPT: Don't touch tables
 \begin{sidewaystable}[b]
@@ -275,8 +350,30 @@ As apparent by the Paired t-tests in Table~\ref{tab:metrics_all_yoh}, BGTM was a
 		Significance codes: \sym{*}\,p<0.05, \sym{**}\,p<0.01, \sym{***}\,p<0.001, \sym{\dag}\,p<0.10 (trend).}
 	\label{tab:metrics_all_yoh}
 \end{sidewaystable}
+\begin{sidewaystable}[b]
+	\centering
+	\small
+	\setlength{\tabcolsep}{10pt}
+	\begin{tabular}{l|cc|cc|cc|cc|cc}
+		\toprule
+		\multirow{2}{*}{\textbf{Metric}} & \multicolumn{2}{c|}{\textbf{BGTM}} & \multicolumn{2}{c|}{\textbf{GTM}} & \multicolumn{2}{c|}{\textbf{PBIF}} & \multicolumn{2}{c|}{\textbf{BGTM vs GTM}} & \multicolumn{2}{c}{\textbf{BGTM vs PBIF}}                                                                                                 \\
+		\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
+		                                 & \(\mu\)                            & \(\sigma\)                        & \(\mu\)                            & \(\sigma\)                                & \(\mu\)                                   & \(\sigma\) & \(t\)      & \(p\)                         & \(t\)     & \(p\)                   \\
+		\midrule
+		IF cAUC MAE                      & 53{,}997                           & 21{,}653                          & 57{,}991                           & 20{,}621                                  & 23{,}072                                  & 19{,}136   & \(-1.353\) & \(1.849\times10^{-1}\)        & \(9.013\) & \(1.556\times10^{-10}\) \\
+		IF cAUC RMSE                     & 71{,}835                           & 28{,}603                          & 79{,}860                           & 29{,}010                                  & 30{,}451                                  & 25{,}946   & \(-2.105\) & \(4.279\times10^{-2}\)\sym{*} & \(8.805\) & \(2.732\times10^{-10}\) \\
+		IF AUC APE (\%)                  & 33.35                              & 9.20                              & 36.13                              & 9.46                                      & 12.94                                     & 10.59      & \(-1.612\) & \(1.162\times10^{-1}\)        & \(8.317\) & \(1.043\times10^{-9}\)  \\
+		\midrule
+		\(\mrglu\) MAPE (\%)             & 48.14                              & 27.09                             & 35.60                              & 22.39                                     & 18.56                                     & 11.58      & \(2.678\)  & \(1.133\times10^{-2}\)        & \(6.578\) & \(1.545\times10^{-7}\)  \\
+		\(\mrglu\) MAE                   & 4.62                               & 2.13                              & 3.49                               & 2.21                                      & 1.82                                      & 1.08       & \(2.463\)  & \(1.901\times10^{-2}\)        & \(7.598\) & \(7.919\times10^{-9}\)  \\
+		\(R^2\) APE (\%)                 & 0.35                               & 0.88                              & 0.65                               & 0.88                                      & 0.32                                      & 0.59       & \(-1.636\) & \(1.111\times10^{-1}\)        & \(0.609\) & \(5.466\times10^{-1}\)  \\
+		Slope APE (\%)                   & 45.58                              & 23.70                             & 39.97                              & 23.74                                     & 16.86                                     & 11.37      & \(1.297\)  & \(2.035\times10^{-1}\)        & \(6.812\) & \(7.750\times10^{-8}\)  \\
+		\bottomrule
+	\end{tabular}
+	\caption{Comprehensive curve and quantification metrics for the simulated dataset.
+		Values are means (\(\mu\)) and standard deviations (\(\sigma\)) across subjects.
+		Paired two-sided \(t\)-tests compare GTM or PBIF against BGTM for each metric.
+		Significance codes: \sym{*}\,p<0.05, \sym{**}\,p<0.01, \sym{***}\,p<0.001, \sym{\dag}\,p<0.10 (trend).}
+	\label{tab:metrics_all_sim}
+\end{sidewaystable}
 
-\subsection{Simulated Dataset}
-
-As a complementary quality control step, the performance of Direct IDIF (meaning with no PVC) of the experimental dataset was compared to the simulated dataset.
-The average cAUC MAE of the experimental dataset was 34,929 compared to 
