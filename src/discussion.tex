@@ -6,45 +6,45 @@ BGTM models partial-volume effects and time-varying noise while jointly estimati
 
 Accurate IDIF requires a reliable segmentation of an artery.
 We proposed a fast and fully automatic yet simple segmentation algorithm that extracts the internal carotid arteries from the TOF-MRA image.
-We placed a simple cuboid mask over the expected ICA location, which allowed high-intensity thresholding to avoid non-arterial hyperintense tissues such as lesions. % GPT
+We placed a simple cuboid mask over the expected ICA location, which allowed high-intensity thresholding to avoid non-arterial hyperintense tissues such as lesions.
 Because no ground-truth labels were available, evaluation relied on visual inspection. Future work should include expert annotations to enable statistical metrics such as the Dice coefficient.
-TOF-MRA is not routinely included in many imaging protocols, which limits its immediate applicability. % GPT
+TOF-MRA is not routinely included in many imaging protocols, which limits its immediate applicability.
 
 Spectral analysis was an appropriate choice for modeling the background tissue because it does not force a fixed kinetic model and is much more flexible.
 A fixed one- or two-tissue model can be mismatched when regional kinetics do not follow those forms.
 The input-function model used a PCA prior, which captured most of the variability with a few coefficients.
-However, it still relies on a sufficiently large AIF population. % GPT
-A parametric alternative such as the exponential model of \citeauthor{feng1993models} \cite{feng1993models} could reduce this dependence, provided tracer-specific informative priors on those parameters are available. % GPT
+However, it still relies on a sufficiently large AIF population.
+A parametric alternative such as the exponential model of \citeauthor{feng1993models} \cite{feng1993models} could reduce this dependence, provided tracer-specific informative priors on those parameters are available.
 
-We treated noise as time-varying and used frame-wise weights to normalize variance across time frames. % GPT
+We treated noise as time-varying and used frame-wise weights to normalize variance across time frames.
 Future work could estimate a separate noise level per frame rather than summarizing the variance with a single statistic.
 
 Bayesian inference rests on the likelihood and the priors.
-Thus, the quality and informativeness of the priors can drastically affect the results. % GPT
-By nature, in the PCA-based input function, the coefficients have a strongly informative prior of \(\theta_i \sim \mathcal{N}(0,1)\). % GPT
+Thus, the quality and informativeness of the priors can drastically affect the results.
+By nature, in the PCA-based input function, the coefficients have a strongly informative prior of \(\theta_i \sim \mathcal{N}(0,1)\).
 If a parametric input function model such as Feng were used instead, parameters would need tracer-specific priors that encode the underlying kinetics.
 One way to achieve this is to fit the parametric model to a population of AIFs and use the empirical parameter distributions as priors.
 For the spectral model of background kinetics, we lacked informative prior knowledge and used wide uniform priors.
 More informative priors could improve accuracy and robustness.
 
-In the \fdg\ study, a larger PCA population was available, and the subjects were comatose, which likely reduced inter-subject variability due to low glucose uptake and also reduced motion artifacts. % GPT
+In the \fdg\ study, a larger PCA population was available, and the subjects were comatose, which likely reduced inter-subject variability due to low glucose uptake and also reduced motion artifacts.
 These factors allowed for achieving a high performance by BGTM which was not replicated in the \yohimbine\ study.
 This cohort was small and consisted of healthy young adults with greater inter-subject variability.
 In addition, for this tracer, plasma parent correction was required and was applied with a population-based curve, which does not capture subject-specific metabolism.
 These factors likely contributed to the weaker results.
 
-We ran Monte Carlo PET simulations as a complementary evaluation step with the special advantage of controlled conditions and known ground truth. % GPT
+We ran Monte Carlo PET simulations as a complementary evaluation step with the special advantage of controlled conditions and known ground truth.
 The simulation protocol drew anatomy and kinetics from real scans to keep inputs realistic.
 The goal was quality control of the pipeline rather than replication of individual scans, and comparisons to real data were used only as sanity checks.
-As discussed in Section~\ref{sec:results_simulation}, regional activities were broadly in line with the real data, and Figure~\ref{fig:sim_compare_imgs} shows that early and late frames look consistent with the intended kinetics. % GPT
+As discussed in Section~\ref{sec:results_simulation}, regional activities were broadly in line with the real data, and Figure~\ref{fig:sim_compare_imgs} shows that early and late frames look consistent with the intended kinetics.
 However, Figure~\ref{fig:sim_tac_compare} shows substantial bias in the Direct IDIF for simulated data compared to the experimental data.
-Naturally, this bias then propagated into GTM and therefore BGTM, causing significantly worse performance compared to the experimental \fdg\ dataset. % GPT
+Naturally, this bias then propagated into GTM and therefore BGTM, causing significantly worse performance compared to the experimental \fdg\ dataset.
 
 Several factors could explain this bias.
-First, for reasons pointed out in Section~\ref{sec:methods_simulation}, contrary to other regions, the TTAC of the SOFT region was taken raw from the experimental scan rather than fitting to a compartment model. % GPT
+First, for reasons pointed out in Section~\ref{sec:methods_simulation}, contrary to other regions, the TTAC of the SOFT region was taken raw from the experimental scan rather than fitting to a compartment model.
 This caused the activity in the SOFT region to follow a different kinetic profile than the rest of the regions.
-And since the background tissue lay inside the SOFT region, it affected its signal and therefore affected the ICA signal by spill-in. % GPT
-A better approach would be to set plausible amplitudes and decay rates in an SA model for SOFT and generate its TACs from those parameters. % GPT
+And since the background tissue lay inside the SOFT region, it affected its signal and therefore affected the ICA signal by spill-in.
+A better approach would be to set plausible amplitudes and decay rates in an SA model for SOFT and generate its TACs from those parameters.
 This also has the added advantage of being able to compare BGTM’s estimated spectral parameters with the known ground truth.
 Second, we resampled PET-derived TTACs and the fitted AIF ICA curve to mid-frame times to match the experimental framing, which can lose temporal detail.
 Third, the AIF was fitted with the Feng model using TPCCLIB, and some fits showed unrealistic peaks or fast recirculation, which can propagate bias to all IDIF methods.
@@ -52,5 +52,5 @@ Third, the AIF was fitted with the Feng model using TPCCLIB, and some fits showe
 To our knowledge, whole-brain Monte Carlo simulation with an explicit carotid input for IDIF validation has not been reported.
 If the present simulation framework is refined, it could support systematic studies across key factors.
 These factors include input-function shape (peak height, sharp versus broad peak, slow versus fast decay), background activity level, isotope, frame durations, and scanner geometry.
-Studying these dimensions would clarify when IDIF methods are reliable, highlight failure modes, and guide improvements to the BGTM implementation to adapt to different studies. % GPT
+Studying these dimensions would clarify when IDIF methods are reliable, highlight failure modes, and guide improvements to the BGTM implementation to adapt to different studies.
 

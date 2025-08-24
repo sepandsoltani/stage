@@ -55,12 +55,12 @@ Estimating hundreds of amplitudes with MCMC would be impractical, so a compact b
 To select the basis size, we assumed the background kinetics could be approximated by the impulse response of either a 1TCM or a 2TCM, which entail one or two exponential basis functions, respectively.
 With two basis functions, the sampler frequently converged to nearly identical decay rates or pushed one rate to infinity, indicating a negligible contribution.
 Accordingly, a single exponential basis function was used for both datasets.
-As discussed in Section~\ref{sec:bgtm_modelling}, the PCA weights were assigned the prior \(\theta_i\sim\mathcal{N}(0,1)\). % GPT
+As discussed in Section~\ref{sec:bgtm_modelling}, the PCA weights were assigned the prior \(\theta_i\sim\mathcal{N}(0,1)\).
 The spectral parameters were given weakly informative uniform priors \(\alpha,\beta\sim\mathcal{U}(10^{-5},10^{-2})\) due to the lack of stronger prior knowledge.
 
 Each Markov chain was run for 230{,}000 iterations with a 30{,}000-iteration burn-in to ensure convergence.
 
-\section{Simulation}\label{sec:results_simulation} % GPT
+\section{Simulation}\label{sec:results_simulation}
 Of the 59 \fdg\ subjects, 24 were excluded because large tumors or post-surgical skull openings caused the tissue-classification algorithm to fail.
 The remaining 35 subjects were used to build numerical phantoms and to generate TACs for the simulation protocol.
 The PET-SORTEO platform generated realistic PET in sinogram format based on these protocols.
@@ -69,8 +69,8 @@ Sinograms were reconstructed with the same software and settings as the experime
 The simulations were intended for quality control of the pipeline rather than replication of individual scans, and comparisons to real data were used only as sanity checks.
 Figure~\ref{fig:sim_compare_imgs} shows sagittal slices from the second and last frames for a representative subject, including the real PET, the simulation input, and the simulation output.
 Less detail is visible in the neck region because we did not model the full arterial tree, the venous system, or glands.
-The early frame (top row) roughly coincides with the AIF peak and the activity in the ICA is clearly visible. % GPT
-In the late frame, when the tissues reach steady state, the brain activity seems realistic, and we see an adequate contrast between regions such as WM and GM. % GPT
+The early frame (top row) roughly coincides with the AIF peak and the activity in the ICA is clearly visible.
+In the late frame, when the tissues reach steady state, the brain activity seems realistic, and we see an adequate contrast between regions such as WM and GM.
 
 Figure~\ref{fig:sim_tac_compare} compares a partial-volume–corrected TAC from the simulation output with its simulation input.
 As expected, there are small differences due to noise in larger regions such as GM and the cerebellum, and there is a clear bias in the ICA because it is strongly affected by partial-volume effects.
