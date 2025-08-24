@@ -65,8 +65,8 @@ The TOF-MRA was registered to this reference using an affine transformation, and
 \section{Partial Volume Correction}
 
 \subsection{Geometric Transfer Matrix}
-As we discussed before in \ref{TODO}, direct extraction of the radioactivity in the arteries is not practical due to PVC.
-Geometric Transfer Matrix aims to account for this loss of signal by considering the observed TACs are linear combination of the true value and other effecting regions \cite{rousset1998correction}.
+As discussed before in Section~\ref{sec:pve}, direct extraction of the radioactivity in the arteries is not practical due to PVC. % GPT
+Geometric Transfer Matrix aims to account for this loss of signal by considering the observed TACs are a linear combination of the true value and other affecting regions \cite{rousset1998correction}. % GPT
 
 Here we define two regions, the carotid and the surrounding tissues (background).
 A mask for extracting the activities of the latter was obtained by dilating the carotid mask by 5 mm and subtracting the voxels corresponding to the carotid mask (Figure~\ref{fig:seg_pipeline}, Step IV).
@@ -93,7 +93,7 @@ A mask for extracting the activities of the latter was obtained by dilating the 
 		\end{bmatrix}
 	}_{\text{Unknown}},
 \end{equation}
-where $\omega_{n \rightarrow m}$ are the spill-in and spill-over coefficient of region $n$ onto region $m$, which is obtained by convolving the binary mask of region $n$ with the system's point spread function and integrating the resulting intensity over region $m$, normalized by the total signal in region $m$.
+where $\omega_{n \rightarrow m}$ are the spill-in and spill-over coefficients of region $n$ onto region $m$, as defined below. % GPT
 where
 \begin{equation}
 	\omega_{n\to m} = \frac{\displaystyle \int_{\Omega_m} \bigl( h \ast \chi_n \bigr)(r)\,dr}{\displaystyle \int_{\Omega_m} \bigl( h \ast \chi_m \bigr)(r)\,dr},
@@ -109,9 +109,9 @@ Time-varying noise arises from several factors, including the small diameter of 
 
 \subsection{Bayesian Geometric Transfer Matrix}
 
-\subsubsection{Modelling}
+\subsubsection{Modelling}\label{sec:bgtm_modelling} % GPT
 For each subject, \(T_{IF}\) is modeled as a linear combination of a population mean and principal components obtained by applying principal component analysis (PCA) to AIFs from the cohort.
-Specifically, for each subject, a subset randomly selected subjects—excluding the subject under study—is used to build a PCA basis.
+Specifically, for each subject, a subset of randomly selected subjects—excluding the subject under study—is used to build a PCA basis. % GPT
 After zero-centering the training AIFs, PCA yields principal axes \(\phi_i(t)\) with explained variances \(\lambda_i\).
 We define scaled components \(v_i(t) = \sqrt{\lambda_i}\,\phi_i(t)\), and write
 \begin{equation}
@@ -131,11 +131,11 @@ where \(\circledast\) denotes convolution, \(\alpha_i\) is the amplitude, and \(
 
 \subsubsection{Noise}
 Accurate noise modeling is challenging because multiple sources contribute to the variance.
-Some effects (e.g. scatter, randoms, and motion) are partially corrected during reconstruction post-processing.
+Some effects (e.g., scatter, randoms, and motion) are partially corrected during reconstruction post-processing. % GPT
 The main contributor is low-count statistics, an inherent limitation of PET due to detector performance and overall camera sensitivity, which is particularly problematic for IDIF because the ICAs are small, early frames are very short during the bolus passage, and radioactive decay reduces detected events, increasing variance across frames.
 
 While raw PET counts are Poisson-distributed, post-reconstruction noise is typically approximated as Gaussian \cite{TODO}.
-To account for time-varying noise, we use per-frame weights to normalize variance across frames:
+To account for time-varying noise, we use per-frame weights to normalize variance across frames: % GPT
 \begin{equation}
 	\omega_{i} = \frac{\Delta t_i}{c_i}\,\exp\!\left(-\frac{t_{i}\,\ln 2}{T_{1/2}}\right),
 \end{equation}
@@ -152,7 +152,7 @@ Let \(\mathcal{D}\) denote the observed PET TAC, and let \( \Theta = (\theta_{1}
 We aim to estimate the joint posterior \(p(\Theta,\sigma^2\mid \mathcal{D})\).
 
 By Bayes’ rule,
-\begin{equation}
+\begin{equation}\label{eq:posterior} % GPT
 	p(\Theta,\sigma^2 \mid \mathcal{D}) \propto p(\mathcal{D} \mid \Theta,\sigma^2)\,\pi( \Theta )\,\pi( \sigma^2),
 \end{equation}
 where \(p(\mathcal{D} \mid \Theta,\sigma^2)\) is the likelihood and \(\pi(\cdot)\) are the priors.
@@ -171,7 +171,7 @@ For convenience, define
 where \(\mathcal{G}\) is the GTM operator and \(\mathcal{T}\) is the predicted activity (after PVE).
 Assuming Gaussian noise with frame weights \(\omega_i\), the likelihood is
 \begin{equation}
-	p(\mathcal{D} \mid \Theta,\sigma^2) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi \sigma^2}} \exp\!\left( -\frac{\omega_i\,\bigl(\mathcal{D}(t_i) - \mathcal{T}(t_i)\bigr)^2}{2\sigma^2} \right).
+	p(\mathcal{D} \mid \Theta,\sigma^2) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi \sigma^2}} \exp\!\left( -\frac{\omega_i,\bigl(\mathcal{D}(t_i) - \mathcal{T}(t_i)\bigr)^2}{2\sigma^2} \right).
 \end{equation}
 We refer to this framework as the Bayesian Geometric Transfer Matrix (Bayesian GTM or BGTM).
 
@@ -196,7 +196,7 @@ Given a chosen coefficient of variation (CV), we set
 \end{equation}
 
 \subsubsection{Sampling}
-Direct evaluation of the posterior \ref{TODO} is intractable, so we employ Monte Carlo sampling.
+Direct evaluation of the posterior in \eqref{eq:posterior} is intractable, so we employ Monte Carlo sampling. % GPT
 We use a Markov chain Monte Carlo scheme with a Metropolis-within-Gibbs strategy.
 
 Gibbs updates draw each parameter from its univariate conditional posterior \(p(\Theta_i \mid \mathcal{D}, \Theta_{-i}, \sigma^2)\) and the noise variance from \(p(\sigma^2 \mid \mathcal{D},\Theta)\).
@@ -229,7 +229,7 @@ For \yohimbine, kinetic modeling requires the plasma parent activity, so whole-b
 \begin{equation}
 	C_{P,\mathrm{parent}}(t) \;=\; \frac{C_{WB,\mathrm{IDIF}}(t)}{R_{bp}} \,\times\, \mathrm{PPF}(t),
 \end{equation}
-where \(R_{bp}=0.661\) is the whole-blood–to–plasma ratio and \(\mathrm{PPF}(t)\) is the plasma parent fraction modeled as a 3 exponential curve:  \cite{laurencin2021modeling}
+where \(R_{bp}=0.661\) is the whole-blood–to–plasma ratio and \(\mathrm{PPF}(t)\) is the plasma parent fraction modeled as a three-exponential curve \cite{laurencin2021modeling}: % GPT
 \begin{equation}
 	\mathrm{PPF}(t) \;=\; 0.30\,e^{-t/0.88} \;+\; 0.09\,e^{-t/11.49} \;+\; 0.61\,e^{-t/65.77}.
 \end{equation}
@@ -238,7 +238,8 @@ Because \(V_T\) estimation uses total plasma parent activity, no additional free
 \section{Evaluation}
 
 \subsection{IF Curves}
-The performance of the proposed IDIF estimation was first evaluated by computing the mean absolute error (MAE) between the cumulative area under the curve (cAUC) of the estimated IDIF and the \textit{ground true} AIF. cAUC was considered to be a more suitable metric since it provides an integrated measure of tracer exposure over time and is less sensitive to local fluctuations or noise in the curve compared to the directly comparing the TACs.
+The performance of the proposed IDIF estimation was first evaluated by computing the mean absolute error (MAE) between the cumulative area under the curve (cAUC) of the estimated IDIF and the \textit{ground truth} AIF. % GPT
+cAUC was considered to be a more suitable metric since it provides an integrated measure of tracer exposure over time and is less sensitive to local fluctuations or noise in the curve compared with directly comparing the TACs. % GPT
 \begin{equation}
 	\textrm{cAUC}(t) =  \int_{0}^{t} IF(\tau) \, d\tau,
 \end{equation}
@@ -284,7 +285,7 @@ and
 \end{equation}
 where \(R^2_i\) and \(S_i\) denote the coefficient of determination and slope for subject \(i\), respectively.
 
-\section{Simulation}
+\section{Simulation}\label{sec:methods_simulation} % GPT
 PET simulations are integral to validating statistical and analytical PET methods because they provide ground truth that may be unavailable or affected by human or instrumental error in experimental data.
 In the previous section, we treated the AIF as the ground truth and evaluated methods against it.
 However, because AIF measurement and analysis involve multiple manual steps and devices operated by different personnel, errors can occur.
@@ -295,10 +296,11 @@ This fidelity strongly depends on accurate descriptions of both the physical ana
 
 As input, PET-SORTEO requires the description and geometry of the PET machine, a 3D emission phantom segmenting the tissues into emitting regions, a 3D attenuation phantom describing tissue attenuation coefficients, and TACs for each emitting region.
 For this study, we simulated the \fdg\ dataset using the Biograph mMR model to mirror the experimental datasets, and we derived numerical phantoms and TACs from the real MR and PET data.
+A schematic of the overall simulation pipeline is shown in Figure~\ref{fig:sim_pipeline}. % GPT
 
 For each subject, first, the brain atlas subregions were merged into larger regions: white matter (WM), gray matter (GM), gray nuclei (GN), cerebellar gray matter (CGM), and cerebellar white matter (CWM).
 An algorithm originally developed for pseudo-CT generation from T1-weighted MRI for bone attenuation correction was used to create masks for the extracerebral regions\cite{mérid2017}.
-Values above 300 were labeled as bone (BONE) and values between \(-300\) and \(300\) after excluding the brain as extracerebral soft tissues (SOFT) which includes the scalp, neck muscles, glands, eyes, etc.
+Values above 300 were labeled as bone (BONE) and values between \(-300\) and \(300\) after excluding the brain as extracerebral soft tissues (SOFT), which include the scalp, neck muscles, glands, and eyes. % GPT
 The leftover space between the skull and the brain was labeled as cerebrospinal fluid (CSF).
 Finally, the arterial mask (ICA) was obtained from the TOF-MRA segmentation (Section~\ref{sec:carotid}).
 These nine regions were combined to form the emission phantom.
@@ -313,7 +315,7 @@ Several practical considerations were applied.
 Our SOFT definition is broad; while adequate for simulation, it violates homogeneity assumptions in compartment modeling, so the unfitted TAC was retained for SOFT.
 The pseudo-CT algorithm was permissive for BONE, leading to overestimated BONE TACs due to spill-in; empirically, BONE activity was scaled by 0.5.
 
-Extracting the correct activity of the CSF with this approach is not feasible since it's a very thin region which is heavily affected by PVE. Thus, CSF TAC was considered 0.2 of the fitted WM TAC.
+Extracting the correct activity of the CSF with this approach is not feasible since it's a very thin region which is heavily affected by PVE. Thus, CSF TAC was considered 0.2 of the fitted WM TAC. % GPT
 \begin{figure}[h]
 	\centering
 	\begin{tikzpicture}[
@@ -375,6 +377,5 @@ Extracting the correct activity of the CSF with this approach is not feasible si
 		\end{pgfonlayer}
 		\node at ($(phantom.south)-(0,0.5)$) {\text{Ground Truth}};
 	\end{tikzpicture}
-	% write a caption
-	\caption{}
+	\caption{Simulation pipeline linking real data, derived ground-truth inputs, and simulated PET output.}\label{fig:sim_pipeline} % GPT
 \end{figure}

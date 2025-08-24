@@ -55,12 +55,12 @@ Estimating hundreds of amplitudes with MCMC would be impractical, so a compact b
 To select the basis size, we assumed the background kinetics could be approximated by the impulse response of either a 1TCM or a 2TCM, which entail one or two exponential basis functions, respectively.
 With two basis functions, the sampler frequently converged to nearly identical decay rates or pushed one rate to infinity, indicating a negligible contribution.
 Accordingly, a single exponential basis function was used for both datasets.
-As discussed in Section~\ref{TODO}, the PCA weights were assigned the prior \(\theta_i\sim\mathcal{N}(0,1)\).
+As discussed in Section~\ref{sec:bgtm_modelling}, the PCA weights were assigned the prior \(\theta_i\sim\mathcal{N}(0,1)\). % GPT
 The spectral parameters were given weakly informative uniform priors \(\alpha,\beta\sim\mathcal{U}(10^{-5},10^{-2})\) due to the lack of stronger prior knowledge.
 
 Each Markov chain was run for 230{,}000 iterations with a 30{,}000-iteration burn-in to ensure convergence.
 
-\section{Simulation}
+\section{Simulation}\label{sec:results_simulation} % GPT
 Of the 59 \fdg\ subjects, 24 were excluded because large tumors or post-surgical skull openings caused the tissue-classification algorithm to fail.
 The remaining 35 subjects were used to build numerical phantoms and to generate TACs for the simulation protocol.
 The PET-SORTEO platform generated realistic PET in sinogram format based on these protocols.
@@ -69,8 +69,8 @@ Sinograms were reconstructed with the same software and settings as the experime
 The simulations were intended for quality control of the pipeline rather than replication of individual scans, and comparisons to real data were used only as sanity checks.
 Figure~\ref{fig:sim_compare_imgs} shows sagittal slices from the second and last frames for a representative subject, including the real PET, the simulation input, and the simulation output.
 Less detail is visible in the neck region because we did not model the full arterial tree, the venous system, or glands.
-The early frame (top row) roughly coincides with the AIF peak and the activity in ICA is clearly visible.
-In the late frame, when the tissues reach steady state, the brain activity seems realistic and we see an adequete contrast between regions such as WM and GM.
+The early frame (top row) roughly coincides with the AIF peak and the activity in the ICA is clearly visible. % GPT
+In the late frame, when the tissues reach steady state, the brain activity seems realistic, and we see an adequate contrast between regions such as WM and GM. % GPT
 
 Figure~\ref{fig:sim_tac_compare} compares a partial-volume–corrected TAC from the simulation output with its simulation input.
 As expected, there are small differences due to noise in larger regions such as GM and the cerebellum, and there is a clear bias in the ICA because it is strongly affected by partial-volume effects.
@@ -274,7 +274,7 @@ Paired t-tests showed no improvement over GTM for cAUC MAE (\(t=-1.353,\,p=0.185
 	\centering
 	\small
 	\setlength{\tabcolsep}{10pt}
-    \caption*{\fdg\ Dataset}
+	\caption*{\fdg\ Dataset}
 	\begin{tabular}{l|cc|cc|cc|cc|cc}
 		\toprule
 		\multirow{2}{*}{\textbf{Metric}} & \multicolumn{2}{c|}{\textbf{BGTM}} & \multicolumn{2}{c|}{\textbf{GTM}} & \multicolumn{2}{c|}{\textbf{PBIF}} & \multicolumn{2}{c|}{\textbf{BGTM vs GTM}} & \multicolumn{2}{c}{\textbf{BGTM vs PBIF}}                                                                                                                  \\
@@ -302,7 +302,7 @@ Paired t-tests showed no improvement over GTM for cAUC MAE (\(t=-1.353,\,p=0.185
 	\centering
 	\small
 	\setlength{\tabcolsep}{10pt}
-    \caption*{\yohimbine\ Dataset}
+	\caption*{\yohimbine\ Dataset}
 	\begin{tabular}{l|cc|cc|cc|cc|cc}
 		\toprule
 		\multirow{2}{*}{\textbf{Metric}} & \multicolumn{2}{c|}{\textbf{BGTM}} & \multicolumn{2}{c|}{\textbf{GTM}} & \multicolumn{2}{c|}{\textbf{PBIF}} & \multicolumn{2}{c|}{\textbf{BGTM vs GTM}} & \multicolumn{2}{c}{\textbf{BGTM vs PBIF}}                                                                                                  \\
@@ -329,7 +329,7 @@ Paired t-tests showed no improvement over GTM for cAUC MAE (\(t=-1.353,\,p=0.185
 	\centering
 	\small
 	\setlength{\tabcolsep}{10pt}
-    \caption*{Simulated Dataset}
+	\caption*{Simulated Dataset}
 	\begin{tabular}{l|cc|cc|cc|cc|cc}
 		\toprule
 		\multirow{2}{*}{\textbf{Metric}} & \multicolumn{2}{c|}{\textbf{BGTM}} & \multicolumn{2}{c|}{\textbf{GTM}} & \multicolumn{2}{c|}{\textbf{PBIF}} & \multicolumn{2}{c|}{\textbf{BGTM vs GTM}} & \multicolumn{2}{c}{\textbf{BGTM vs PBIF}}                                                                                                 \\
@@ -352,4 +352,3 @@ Paired t-tests showed no improvement over GTM for cAUC MAE (\(t=-1.353,\,p=0.185
 		Significance codes: \sym{*}\,p<0.05, \sym{**}\,p<0.01, \sym{***}\,p<0.001, \sym{\dag}\,p<0.10 (trend).}
 	\label{tab:metrics_all_sim}
 \end{sidewaystable}
-

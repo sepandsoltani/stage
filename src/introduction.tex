@@ -15,7 +15,7 @@ Because it reflects only one time point, the SUV cannot capture the temporal dyn
 
 Dynamic PET imaging provides a more comprehensive view of radiotracer kinetics by acquiring a series of images over a period ranging from a few minutes to more than an hour post-injection, depending on the tracer type.
 Instead of a single snapshot, dynamic imaging produces time-activity curves (TAC) that illustrate how tracer concentration in each tissue changes throughout the scanning period.
-This approach enables the measurement of physiological parameters such as the tracer rate of influx (\(K_i\)), volume of distribution (\(V_T\)), and Binding Potential (BP).
+This approach enables the measurement of physiological parameters such as the tracer rate of influx (\(K_i\)), volume of distribution (\(V_T\)), and binding potential (BP). % GPT
 
 \section{Kinetic Modeling}
 To quantify pharmacokinetic parameters, kinetic modeling is employed.
@@ -80,12 +80,12 @@ where \(K_1\), \(k_2\), \(k_3\), and \(k_4\) are the constant rate parameters.
 	\label{fig:2tcm}
 \end{figure}
 
-The total radiotracer tissular kinetic measured by PET (the PET data), \(C_T(t)\), is given by
+The total radiotracer tissue kinetics measured by PET (the PET data), \(C_T(t)\), is given by % GPT
 \begin{equation}
 	C_T(t) \;=\; C_F(t) \;+\; C_B(t) \;+\; C_P(t).
 \end{equation}
 
-Thus to solve this system of equations and to estimate \(K_1\), \(k_2\), and \(k_3\) parameters, we must fit the model using the measured PET TACs ($C_T$) and the input function ($C_P$).
+Thus, to solve this system of equations and to estimate \(K_1\), \(k_2\), and \(k_3\) parameters, we must fit the model using the measured PET TACs ($C_T$) and the input function ($C_P$). % GPT
 
 For \fdg$\,$ quantification, the metabolic rate of glucose (\(\textrm{MR}_{\textrm{glu}}\)) is calculated as
 \begin{equation}
@@ -93,12 +93,12 @@ For \fdg$\,$ quantification, the metabolic rate of glucose (\(\textrm{MR}_{\text
 \end{equation}
 where \([C]\) denotes the glucose concentration, and \(LC\) is the lumped constant.
 
-For \yohimbine $\,$ quantification, we utilize the Volume of Distribution ($V_T$) which is the ratio of radiotracer concentration in the target tissue ($C_T$) to the plasma ($C_P$):
+For \yohimbine\ quantification, we utilize the volume of distribution ($V_T$), which is the ratio of radiotracer concentration in the target tissue ($C_T$) to the plasma ($C_P$): % GPT
 \[
 	V_T = \frac{C_T}{C_P}
 \]
 
-Using the Logan plot method this can be directly estimated from these two values or to be fitted to a compartment model.
+Using the Logan plot method, this can be directly estimated from these two values, or it can be fitted with a compartment model. % GPT
 In the latter case, $V_T$ can be calculated as
 \[
 	V_T = \frac{K_1}{k_2} (1+\frac{k_3}{k_4})
@@ -113,21 +113,21 @@ However, this procedure is invasive and can cause discomfort, potentially discou
 Furthermore, this method is labor-intensive and requires trained personnel to manage both the subject and the measurement devices.
 
 \subsection{Population-Based Input Function}
-Population-Based Input Function (PBIF) is a method for replacing the subject specific AIF with the average AIFs of a population of other subjects.
+Population-Based Input Function (PBIF) is a method for replacing the subject-specific AIF with the average AIFs of a population of other subjects. % GPT
 In practice, an average curve is derived from a representative cohort and then temporally aligned and scaled to the subject using one or more calibration points (e.g., early blood samples or image-derived peaks).
 PBIF can reduce invasiveness and acquisition burden, but it may introduce bias if the cohort is not well matched to the subject or if calibration is suboptimal.
 
-\subsection{Image Derived Input Function}
-The image-derived input function (IDIF) has been proposed as a non-invasive alternative for obtaining the input function.
+\subsection{Image-Derived Input Function}
+The image-derived input function (IDIF) has been proposed as a non-invasive alternative for obtaining the input function. % GPT
 IDIF techniques typically involve identifying vascular structures or regions with high blood pool activity within the imaging field and extracting the input function directly from the PET images.
-For example, in whole-body, cardiac or small animal PET studies the aorta is visible in the in the Field of View (FOV) of the PET camera and is used as the source for IDIF.
-In brain PET imaging, the Internal Carotid Arteries (ICA) are the largest vessels present in the FOV and have a diameter of approximately 5 mm much smaller than of the aorta.
-Their smaller size makes IDIF more challenging due to Partial Volume Effects
+For example, in whole-body, cardiac, or small-animal PET studies the aorta is visible in the Field of View (FOV) of the PET camera and is used as the source for IDIF. % GPT
+In brain PET imaging, the Internal Carotid Arteries (ICA) are the largest vessels present in the FOV and have a diameter of approximately 5 mm, much smaller than the aorta. % GPT
+Their smaller size makes IDIF more challenging due to partial volume effects (PVE). % GPT
 
-\section{Partial Volume Effect}
+\section{Partial Volume Effect}\label{sec:pve} % GPT
 Partial Volume Effect (PVE) is the loss and mixing of signal that occurs when structures are small relative to the system’s spatial resolution, causing activity to “spill out” of small objects and “spill in” from neighbors.
-In PET, this leads to systematic underestimation of arterial activity and contamination from surrounding tissue, especially for vessels like the ICA that have similar size as the effective resolution of PET camera (both around 5mm).
-In Figure~\ref{fig:pve}, this effect is illustrated by simulating the effect of PET's point spread function (PSF) as well as noise on hot disk.
+In PET, this leads to systematic underestimation of arterial activity and contamination from surrounding tissue, especially for vessels like the ICA that have a similar size to the effective resolution of the PET camera (both around 5 mm). % GPT
+In Figure~\ref{fig:pve}, this effect is illustrated by simulating the effect of PET's point spread function (PSF) as well as noise on a hot disk. % GPT
 Correcting PVE is essential for accurate IDIF estimation and downstream kinetic modeling.
 
 \begin{figure}[h]
