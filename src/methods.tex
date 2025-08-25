@@ -260,7 +260,7 @@ where \(N\) is the number of subjects.
 
 Similarly, for \yohimbine, the volume of distribution (\(V_T\)) was calculated and the dataset error was computed as
 \begin{equation}
-	\mathrm{MAPE}(V_T)
+	\text{Average MAPE}(V_T)
 	= \frac{100}{N}
 	\sum_{i=1}^{N}
 	\biggl(
@@ -277,11 +277,11 @@ Additionally, linear least-squares regression was performed between the regional
 The coefficient of determination (\(R^2\)) and regression slope (\(S\)) were computed per subject.
 The mean absolute percentage errors of these metrics across the dataset are
 \begin{equation}
-	\text{MAPE}(R^2) = \frac{100}{N} \sum_{i=1}^{N} \left| R^2_i - 1 \right|
+	\text{Average MAPE}(R^2) = \frac{100}{N} \sum_{i=1}^{N} \left| R^2_i - 1 \right|
 \end{equation}
 and
 \begin{equation}
-	\text{MAPE}(S) = \frac{100}{N} \sum_{i=1}^{N} \left| S_i - 1 \right|,
+	\text{Average MAPE}(S) = \frac{100}{N} \sum_{i=1}^{N} \left| S_i - 1 \right|,
 \end{equation}
 where \(R^2_i\) and \(S_i\) denote the coefficient of determination and slope for subject \(i\), respectively.
 

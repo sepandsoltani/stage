@@ -49,7 +49,7 @@ For the \yohimbine\ dataset, the maximum feasible \(N=6\) was used given the coh
 	\label{fig:pca_population}
 \end{figure}
 
-In classical spectral analysis, the spectral range is chosen according to the isotope half-life (e.g., \(10^{-4}\,\mathrm{s}^{-1}\) to \(1\,\mathrm{s}^{-1}\) for \(^{18}\mathrm{F}\)) and discretized into \(s=100\) or \(s=1000\) fixed decay rates \(\beta\), while amplitudes \(\alpha\) are fitted to the TAC \cite{TODO}.
+In classical spectral analysis, the spectral range is chosen according to the isotope half-life (e.g., \(10^{-4}\,\mathrm{s}^{-1}\) to \(1\,\mathrm{s}^{-1}\) for \(^{18}\mathrm{F}\)) and discretized into \(s=100\) or \(s=1000\) fixed decay rates \(\beta\), while amplitudes \(\alpha\) are fitted to the TAC \cite{cunningham1993spectral}.
 Peaks in the resulting spectrum correspond to dominant kinetic components of the TAC.
 Estimating hundreds of amplitudes with MCMC would be impractical, so a compact basis is preferred in which both decay rates and amplitudes are learned.
 To select the basis size, we assumed the background kinetics could be approximated by the impulse response of either a 1TCM or a 2TCM, which entail one or two exponential basis functions, respectively.

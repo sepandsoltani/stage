@@ -1,4 +1,12 @@
 \chapter{Introduction}
+\section{Internship Context}
+This internship was conducted at CERMEP--Imagerie du Vivant in Lyon, France.
+CERMEP is a research laboratory and imaging platform dedicated to preclinical and clinical in vivo imaging, including PET, MRI, and CT.
+It also develops and produces radiopharmaceuticals for PET studies to support translational research in neuroscience, cardiology, and related fields.
+The work took place in the PET--MR department, which operates a hybrid PET--MR scanner, conducts acquisition studies, and carries out methodological research.
+The two datasets analyzed in this thesis were acquired at CERMEP using the clinical PET--MR system.
+In this study, we also used in-house tools and software developed at CERMEP, including a PET simulation platform and the algorithm that formed the basis of this work.
+
 \section{Positron Emission Tomography}
 Positron Emission Tomography (PET) is an in vivo functional imaging technique widely used in clinical and research settings to monitor physiological and biochemical processes.
 In PET, a biologically active molecule is labeled with a positron-emitting radioisotope, serving as a radiotracer, and then injected into the body.
@@ -139,7 +147,7 @@ Correcting PVE is essential for accurate IDIF estimation and downstream kinetic 
 Many methods have utilized the first few frames of the dynamic PET, when the tracer has not yet reached tissue and predominantly resides in the arteries, to obtain a mask of the carotids \cite{young2023image}.
 These implementations range from fully manual approaches \cite{feng2015image}, to semi-automatic methods that use a few seed voxels for region growing or to initialize morphological operations \cite{dassanayake2022caliper,vestergaard2021validation}, and to fully automatic pipelines based on deep learning such as custom Convolutional Neural Networks (CNNs) \cite{ferrante2024physically,chen2025deep} and U-Net architectures \cite{chavan2024end}.
 
-However, even with sophisticated approaches, ICA segmentation directly from PET suffers from strong PVE.
+However, even with sophisticated approaches, ICA segmentation directly from PET suffers from strong PVE \cite{zanotti2011image,boellaard2004effects}.
 With the emergence of hybrid PET/MRI systems, it has become feasible to acquire both functional and anatomical data simultaneously.
 MRI provides high-resolution soft-tissue contrast, while PET captures metabolic activity.
 For instance, time-of-flight MR angiography (TOF-MRA) delivers excellent arterial contrast.
@@ -158,5 +166,5 @@ However, these linear mixing models do not account for additional effects such a
 More advanced approaches include model-based matrix factorization that jointly estimates the input function and tissue activity \cite{fang2022image}; non–deep-learning strategies that infer the blood curve without explicit vessel segmentation—such as factor analysis / cluster-IDIF, population-based input functions, and optimization-derived input functions \cite{simoncic2015image,lyoo2014image,dias2022clinical}; and deep learning \cite{kawauchi2023convolutional}.
 
 In this work, we propose a fully automatic pipeline for extracting the ICA mask from TOF-MRA.
-We then employ a Bayesian framework that couples GTM-based mixing with priors on the input function and tissue kinetics, explicitly modeling noise to improve IDIF estimation \cite{irace2021bayesian}.
+We then employ a Bayesian framework that couples GTM-based mixing with priors on the input function and tissue kinetics, explicitly modeling noise to improve IDIF estimation \cite{irace2021bayesian} aiming to eliminate the need for invasive arterial blood sampling in dynamic PET imaging.
 
