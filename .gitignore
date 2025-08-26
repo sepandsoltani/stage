@@ -1,2 +1,4 @@
 build/*
 !build/sepand_stage_report_2025.pdf
+build_pres/*
+!build_pres/sepand_stage_presentation.pdf

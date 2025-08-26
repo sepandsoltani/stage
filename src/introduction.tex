@@ -145,7 +145,7 @@ Correcting PVE is essential for accurate IDIF estimation and downstream kinetic 
 \end{figure}
 \section{Background}
 Many methods have utilized the first few frames of the dynamic PET, when the tracer has not yet reached tissue and predominantly resides in the arteries, to obtain a mask of the carotids \cite{young2023image}.
-These implementations range from fully manual approaches \cite{feng2015image}, to semi-automatic methods that use a few seed voxels for region growing or to initialize morphological operations \cite{dassanayake2022caliper,vestergaard2021validation}, and to fully automatic pipelines based on deep learning such as custom Convolutional Neural Networks (CNNs) \cite{ferrante2024physically,chen2025deep} and U-Net architectures \cite{chavan2024end}.
+These implementations range from fully manual approaches \cite{feng2015image}, to semi-automatic methods that use a few seed voxels for region growing or to initialize morphological operations \cite{vestergaard2021validation}, and to fully automatic pipelines based on deep learning such as custom Convolutional Neural Networks (CNNs) \cite{ferrante2024physically,chen2025deep} and U-Net architectures \cite{chavan2024end}.
 
 However, even with sophisticated approaches, ICA segmentation directly from PET suffers from strong PVE \cite{zanotti2011image,boellaard2004effects}.
 With the emergence of hybrid PET/MRI systems, it has become feasible to acquire both functional and anatomical data simultaneously.
@@ -158,12 +158,16 @@ Meanwhile, T1-weighted scans are routinely acquired for anatomical localization 
 In this context, \citeauthor{rahman2024deep} \cite{rahman2024deep} proposed a deep learning model that infers the ICA directly from T1-weighted images.
 
 As noted above, even with a high-resolution anatomical arterial mask, PVE remains and must be corrected.
-Partial Volume Correction (PVC) methods estimate spill-in and spill-out coefficients between the ICA and surrounding tissue.
-Recovery Coefficients (RC) are commonly used, obtained by scanning cylindrical phantoms of various diameters and matching the ICA diameter to the closest phantom \cite{dassanayake2022caliper,lyoo2014image}.
-The Geometric Transfer Matrix (GTM) method generalizes this by estimating regional spillover based on volume geometry and an explicit point spread function (PSF) model \cite{rousset1998correction}.
+Some Partial Volume Correction (PVC) methods estimate spill-in and spill-out coefficients between the ICA and surrounding tissue.
+Recovery Coefficients (RC) are commonly used in IDIF PVC, obtained by scanning cylindrical phantoms of various diameters and matching the ICA diameter to the closest phantom \cite{feng2015image,dassanayake2022caliper,lyoo2014image}.
+The Geometric Transfer Matrix (GTM) method generalizes this by estimating regional spillover based on volume geometry and an explicit point spread function (PSF) model of the PET scanner\cite{rousset1998correction}.
 However, these linear mixing models do not account for additional effects such as time-varying noise or motion, and they typically treat the problem as a fixed linear unmixing without propagating uncertainty, which can limit recovery.
+\citeauthor{sari2017estimation} \cite{sari2017estimation} proposed an iterative voxel-based PVC method called Single-Target Correction.
+Although more robust
 
-More advanced approaches include model-based matrix factorization that jointly estimates the input function and tissue activity \cite{fang2022image}; non–deep-learning strategies that infer the blood curve without explicit vessel segmentation—such as factor analysis / cluster-IDIF, population-based input functions, and optimization-derived input functions \cite{simoncic2015image,lyoo2014image,dias2022clinical}; and deep learning \cite{kawauchi2023convolutional}.
+More advanced approaches include model-based matrix factorization that jointly estimates the input function and tissue activity \cite{fang2022image}.
+Techniques have also been developed to infer the AIF without explicit vessel segmentation. 
+Such as factor analysis \cite{simoncic2015image}, deep learning technique such as physically informed \cite{ferrante2024physically} and custom CNN models \cite{kawauchi2023convolutional}, and non-IDIF methods such as and population-based input function \cite{dias2022clinical}.
 
 In this work, we propose a fully automatic pipeline for extracting the ICA mask from TOF-MRA.
 We then employ a Bayesian framework that couples GTM-based mixing with priors on the input function and tissue kinetics, explicitly modeling noise to improve IDIF estimation \cite{irace2021bayesian} aiming to eliminate the need for invasive arterial blood sampling in dynamic PET imaging.

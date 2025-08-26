@@ -29,7 +29,7 @@ Because vessels appear hyperintense in TOF-MRA, a high-intensity threshold can e
 However, lesions—which were common in the comatose cohort—and venous structures can also appear hyperintense, and may be inadvertently selected by thresholding.
 To exclude these, a cuboid volume of interest (VOI) was defined in a reference space to cover the anatomical region where the ICAs are most likely to appear (Step I).
 The threshold was set to the 1st percentile of all non-zero voxels in the image and applied only within the VOI (Step II).
-A 3D connected-components filter was then applied, and the two largest connected components were retained as the left and right internal carotid arteries (Step III).
+A 3D connected-components filter was then applied, and the two largest connected volumes were retained as the left and right internal carotid arteries (Step III).
 
 The reference image was the standard MNI152 atlas, padded by 50\% in the inferior direction (negative \(z\) in voxel space) because the original atlas excludes the subcranial region relevant for the ICAs.
 The TOF-MRA was registered to this reference using an affine transformation, and the resulting matrix was used to map the VOI into TOF-MRA space before applying the thresholding and connectivity steps.
@@ -46,7 +46,7 @@ The TOF-MRA was registered to this reference using an affine transformation, and
 		\node[mybox, right=of input] (cuboid) {I) Cuboid Mask\\Application};
 
 		\node[mybox, right=of cuboid] (thresh) {II) Adaptive\\ Threshold};
-		\node[mybox, below=of thresh] (growing) {III) Largest 2 Regions};
+		\node[mybox, below=of thresh] (growing) {III) Largest 2 Volumes};
 		\node[mybox, left=of growing] (dilation) {IV) Dilation};
 		\node[mybox, below=of growing] (mask) {Carotid\\Mask};
 		\node[mybox, below=of dilation] (bg_mask) {Background\\Mask};
