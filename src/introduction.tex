@@ -25,10 +25,10 @@ Dynamic PET imaging provides a more comprehensive view of radiotracer kinetics b
 Instead of a single snapshot, dynamic imaging produces time-activity curves (TAC) that illustrate how tracer concentration in each tissue changes throughout the scanning period.
 This approach enables the measurement of physiological parameters such as the tracer rate of influx (\(K_i\)), volume of distribution (\(V_T\)), and binding potential (BP).
 
-\section{Kinetic Modeling}
-To quantify pharmacokinetic parameters, kinetic modeling is employed.
-Compartmental modeling is the most popular and is considered the most accurate approach in kinetic modeling.
-In compartmental modeling, the distribution and kinetics of a radiotracer are described by dividing the system into distinct compartments, each representing a pool of tracer that behaves uniformly.
+\section{Kinetic Modelling}
+To quantify pharmacokinetic parameters, kinetic modelling is employed.
+Compartmental modelling is the most popular and is considered the most accurate approach in kinetic modelling.
+In compartmental modelling, the distribution and kinetics of a radiotracer are described by dividing the system into distinct compartments, each representing a pool of tracer that behaves uniformly.
 Interactions between compartments can be unidirectional or bidirectional, meaning the tracer may either move in and out or only enter a compartment.
 Various graphical models (e.g., the Logan \cite{logan1990graphical} and Patlak \cite{patlak1983graphical} methods), as well as classical compartmental model fitting approaches, are used to analyze tracer kinetics.
 
@@ -37,12 +37,38 @@ This model comprises one tissue compartment for the free tracer, \(C_F(t)\), and
 
 The tracer kinetics are governed by a series of first-order differential equations, in which the exchange rates between the compartments are considered constant:
 \begin{align}
-	\frac{dC_F(t)}{dt} & = K_1 \, C_P(t) \;-\; \bigl(k_2 + k_3\bigr) C_F(t) \;+\; k_4 C_B(t) \,, \label{eq:2tcm-c1} \\[6pt]
-	\frac{dC_B(t)}{dt} & = k_3 \, C_F(t) \;-\; k_4 \, C_B(t), \label{eq:2tcm-c2}
+	\frac{dC_F(t)}{dt} & = K_1 \, C_P(t) \;-\; \bigl(k_2 + k_3\bigr) C_F(t) \;+\; k_4 C_B(t) \,, \\[6pt]
+	\frac{dC_B(t)}{dt} & = k_3 \, C_F(t) \;-\; k_4 \, C_B(t),
 \end{align}
 where \(K_1\), \(k_2\), \(k_3\), and \(k_4\) are the constant rate parameters.
 
-\begin{figure}[b]
+
+The total radiotracer tissue kinetics measured by PET (the PET data), \(C_T(t)\), is given by
+\begin{equation}
+	C_T(t) \;=\; C_F(t) \;+\; C_B(t) \;+\; C_P(t).
+\end{equation}
+
+Thus, to solve this system of equations and to estimate \(K_1\), \(k_2\), and \(k_3\) parameters, we must fit the model using the measured PET TACs ($C_T$) and the input function ($C_P$).
+
+\fdg\ is a glucose analog used in PET to map tissue metabolism, the rate of which called the metabolic rate of glucose (\(\textrm{MR}_{\textrm{glu}}\)) is calculated as
+\begin{equation}
+	\textrm{MR}_{\textrm{glu}} \; (\textrm{\textmu mol/min/100g}) = \frac{[C]}{LC} \cdot \frac{K_1 \times k_3}{k_2 + k_3} \,.
+\end{equation}
+where \([C]\) denotes the glucose concentration, and \(LC\) is the lumped constant.
+
+\yohimbine\ is an $\alpha_2$-adrenergic receptor radioligand with reversible binding.
+For its quantification, we utilize the volume of distribution ($V_T$), which is the ratio of radiotracer concentration in the target tissue ($C_T$) to the plasma ($C_P$):
+\begin{equation}
+	V_T = \frac{C_T}{C_P}
+\end{equation}
+
+Using the Logan plot method, this can be directly estimated from these two values, or it can be fitted with a compartment model.
+In the latter case, $V_T$ can be calculated as
+\begin{equation}
+	V_T = \frac{K_1}{k_2} (1+\frac{k_3}{k_4})
+\end{equation}
+
+\begin{figure}[t]
 	\centering
 	\begin{tikzpicture}[>=latex, thick,node distance=1.5cm]
 		\node[cylinder, draw, shape border rotate=90, aspect=0.3, minimum height=2.5cm, minimum width=1.7cm, align=center, fill=red!80] (Cp) at (0,0) {$C_P$};
@@ -65,9 +91,9 @@ where \(K_1\), \(k_2\), \(k_3\), and \(k_4\) are the constant rate parameters.
 		node[above] {\(k_3\)}
 		([yshift=8pt]C2.west);
 
-		\draw[->, dashed, opacity=0.5]
+		\draw[->]
 		([yshift=-8pt]C2.west) to[out=180, in=0]
-		node[below] {\(k_4 = 0\)}
+		node[below] {\(k_4\)}
 		([yshift=-8pt]C1.east);
 
 		% Draw yellow box in background
@@ -87,31 +113,6 @@ where \(K_1\), \(k_2\), \(k_3\), and \(k_4\) are the constant rate parameters.
 	\caption{Schematic of the two-tissue compartment model (2TCM)}
 	\label{fig:2tcm}
 \end{figure}
-
-The total radiotracer tissue kinetics measured by PET (the PET data), \(C_T(t)\), is given by
-\begin{equation}
-	C_T(t) \;=\; C_F(t) \;+\; C_B(t) \;+\; C_P(t).
-\end{equation}
-
-Thus, to solve this system of equations and to estimate \(K_1\), \(k_2\), and \(k_3\) parameters, we must fit the model using the measured PET TACs ($C_T$) and the input function ($C_P$).
-
-For \fdg$\,$ quantification, the metabolic rate of glucose (\(\textrm{MR}_{\textrm{glu}}\)) is calculated as
-\begin{equation}
-	\textrm{MR}_{\textrm{glu}} \; (\textrm{\textmu mol/min/100g}) = \frac{[C]}{LC} \cdot \frac{K_1 \times k_3}{k_2 + k_3} \,.
-\end{equation}
-where \([C]\) denotes the glucose concentration, and \(LC\) is the lumped constant.
-
-For \yohimbine\ quantification, we utilize the volume of distribution ($V_T$), which is the ratio of radiotracer concentration in the target tissue ($C_T$) to the plasma ($C_P$):
-\[
-	V_T = \frac{C_T}{C_P}
-\]
-
-Using the Logan plot method, this can be directly estimated from these two values, or it can be fitted with a compartment model.
-In the latter case, $V_T$ can be calculated as
-\[
-	V_T = \frac{K_1}{k_2} (1+\frac{k_3}{k_4})
-\]
-
 \section{Input Function}
 
 \subsection{Arterial Input Function}
@@ -136,7 +137,7 @@ Their smaller size makes IDIF more challenging due to partial volume effects (PV
 Partial Volume Effect (PVE) is the loss and mixing of signal that occurs when structures are small relative to the system’s spatial resolution, causing activity to “spill out” of small objects and “spill in” from neighbors.
 In PET, this leads to systematic underestimation of arterial activity and contamination from surrounding tissue, especially for vessels like the ICA that have a similar size to the effective resolution of the PET camera (both around 5 mm).
 In Figure~\ref{fig:pve}, this effect is illustrated by simulating the effect of PET's point spread function (PSF) as well as noise on a hot disk.
-Correcting PVE is essential for accurate IDIF estimation and downstream kinetic modeling.
+Correcting PVE is essential for accurate IDIF estimation and downstream kinetic modelling.
 
 \begin{figure}[h]
 	\includegraphics[width=\textwidth]{figures/pve.jpg}
@@ -145,7 +146,7 @@ Correcting PVE is essential for accurate IDIF estimation and downstream kinetic 
 \end{figure}
 \section{Background}
 Many methods have utilized the first few frames of the dynamic PET, when the tracer has not yet reached tissue and predominantly resides in the arteries, to obtain a mask of the carotids \cite{young2023image}.
-These implementations range from fully manual approaches \cite{feng2015image}, to semi-automatic methods that use a few seed voxels for region growing or to initialize morphological operations \cite{vestergaard2021validation}, and to fully automatic pipelines based on deep learning such as custom Convolutional Neural Networks (CNNs) \cite{ferrante2024physically,chen2025deep} and U-Net architectures \cite{chavan2024end}.
+These implementations range from fully manual approaches \cite{feng2015image}, to semi-automatic methods that use a few seed voxels for region growing or to initialize morphological operations \cite{vestergaard2021validation}, and to fully automatic pipelines based on deep learning such as custom Convolutional Neural Networks (CNNs) \cite{chen2025deep} and U-Net architectures \cite{chavan2024end}.
 
 However, even with sophisticated approaches, ICA segmentation directly from PET suffers from strong PVE \cite{zanotti2011image,boellaard2004effects}.
 With the emergence of hybrid PET/MRI systems, it has become feasible to acquire both functional and anatomical data simultaneously.
@@ -162,13 +163,13 @@ Some Partial Volume Correction (PVC) methods estimate spill-in and spill-out coe
 Recovery Coefficients (RC) are commonly used in IDIF PVC, obtained by scanning cylindrical phantoms of various diameters and matching the ICA diameter to the closest phantom \cite{feng2015image,dassanayake2022caliper,lyoo2014image}.
 The Geometric Transfer Matrix (GTM) method generalizes this by estimating regional spillover based on volume geometry and an explicit point spread function (PSF) model of the PET scanner\cite{rousset1998correction}.
 However, these linear mixing models do not account for additional effects such as time-varying noise or motion, and they typically treat the problem as a fixed linear unmixing without propagating uncertainty, which can limit recovery.
-\citeauthor{sari2017estimation} \cite{sari2017estimation} proposed an iterative voxel-based PVC method called Single-Target Correction.
-Although more robust
+\citeauthor{sari2017estimation} proposed an iterative voxel-based PVC method called Single-Target Correction \cite{sari2017estimation}.
 
 More advanced approaches include model-based matrix factorization that jointly estimates the input function and tissue activity \cite{fang2022image}.
-Techniques have also been developed to infer the AIF without explicit vessel segmentation. 
+Techniques have also been developed to infer the AIF without explicit vessel segmentation.
 Such as factor analysis \cite{simoncic2015image}, deep learning technique such as physically informed \cite{ferrante2024physically} and custom CNN models \cite{kawauchi2023convolutional}, and non-IDIF methods such as and population-based input function \cite{dias2022clinical}.
 
-In this work, we propose a fully automatic pipeline for extracting the ICA mask from TOF-MRA.
-We then employ a Bayesian framework that couples GTM-based mixing with priors on the input function and tissue kinetics, explicitly modeling noise to improve IDIF estimation \cite{irace2021bayesian} aiming to eliminate the need for invasive arterial blood sampling in dynamic PET imaging.
 
+In this work, we propose a fully automatic pipeline for extracting the ICA mask from TOF-MRA.
+For IDIF estimation, we adopt the Bayesian framework of Irace et al.\ \cite{irace2021bayesian}, which couples GTM-based mixing with priors on the input function and tissue kinetics and explicitly models noise.
+The goal is to improve and validate this framework aiming to eliminate the need for invasive arterial blood sampling in dynamic PET imaging.

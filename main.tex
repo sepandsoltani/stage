@@ -28,6 +28,7 @@
 \usepackage{array, multirow, tabularx}
 \usepackage{booktabs}
 \usepackage{longtable}
+\usepackage{setspace}
 \usepackage{apalike}
 \usepackage{minitoc}
 \usepackage{tikz}
@@ -44,6 +45,7 @@
 \usepackage{arydshln}
 \usepackage{titling}
 \usepackage{calc}
+\usepackage[xindy]{imakeidx}
 \usepackage{upgreek}
 \usepackage{titlesec} 
 \usepackage{sectsty}
@@ -66,8 +68,19 @@
 \titleformat{\chapter}[hang]
   {\normalfont\bfseries}{}{0pt}{\Huge}
 
+\makeatletter
+\renewcommand\section{%
+  \@startsection{section}{1}{\z@}
+  {1.5ex plus .2ex minus .2ex}
+  {0.6ex}%                      
+  {\normalfont\Large\bfseries}}
 
-\definecolor{darkseagreen}{rgb}{0.56, 0.74, 0.56}
+\renewcommand\subsection{%
+  \@startsection{subsection}{2}{\z@}%
+  {1.2ex plus .2ex minus .2ex}% before-skip
+  {0.5ex}% after-skip
+  {\normalfont\large\bfseries}}
+\makeatother
 
 \title{Estimation of Image-Derived Arterial Input Function in Brain PET Imaging: \\ Application to Modeling PET Dynamics of Glucose Metabolism in Patients with Impaired Consciousness}
 
@@ -80,7 +93,6 @@
 \rightmark 
 
 
-\usepackage[xindy]{imakeidx}
 % \makeindex
 %\input{auxilliaires/glossaire}
 \def\mrglu{\text{MR}_{\text{glu}}}
@@ -88,13 +100,15 @@
 \newcommand{\yohimbine}{$[^{11}\mathrm{C}]\text{Yohimbine}$}
 \newcommand{\sym}[1]{\textsuperscript{#1}}
 
+
 \begin{document}
 
 \begin{titlepage}
 	\begin{center}
 		\begin{tabular}{c@{\hskip 7cm}c@{\hskip 1cm}}
 			\includegraphics[height=3cm]{res/ucbl.png} &
-			\includegraphics[height=3cm]{res/polytech.png}
+			\includegraphics[height=3cm]{res/polytech2.png}
+			% \includegraphics[width=5cm]{res/cermep.png}
 		\end{tabular}
 	\end{center}
 
@@ -107,23 +121,42 @@
 		\rule{\textwidth}{0.8pt} \\
 		\vspace{10pt}
 
-		{\Large \bfseries \thetitle}
+		{\huge \bfseries \thetitle}
 		\rule{\textwidth}{0.8pt} \\
-		\pdfcomment{is it still appropriate to keep the Impaired Consciousness part in the title?}
-
 
 		\vfill
-		By \textsc{\Large Sepand Ali Madad Soltani}\\[1cm]
-		Master 2 in Medical Device Engineering \\
-		Internship Report\\[1.2cm]
-		Supervised by \textsc{\large Inés Mérida}
-		and
-		\textsc{\large Nicolas Costes}  \\[0.2cm]
-		Academic Advisor: \textsc{\large Kevin Tse Ve Koon}\\[0.2cm]
-		Hosting Laboratory:\\
-        CERMEP - Imagrie du Vivant, Lyon, France\\
-		2024-2025
 
+		\vspace{18mm}
+
+		{\Large \textsc{Sepand Ali Madad Soltani}}\\[3mm]
+		{\large Master 2 in Medical Device Engineering}\\[1mm]
+		{\large Internship Report}
+
+		\vspace{12mm}
+
+		{\normalsize \textit{Supervised by} \textsc{Inés Merida} \textit{and} \textsc{Nicolas Costes}}\\[2mm]
+		{\normalsize \textit{Academic Advisor} \textsc{Kevin Tse-Ve-Koon}}
+
+		\vspace{10mm}
+
+		{\normalsize \textit{Hosting Laboratory}}\\
+		{\normalsize CERMEP- imagrie du vivant, Bron, France}
+
+		\vfill
+
+		{\large 2024--2025}
+		%
+		%
+		% \vfill
+		% By \textsc{\Large Sepand Ali Madad Soltani}\\
+		% Master 2 in Medical Device Engineering \\
+		% Internship Report\\
+		% Supervised by \textsc{\large Inés Mérida} and \textsc{\large Nicolas Costes}  \\
+		% Academic Advisor: \textsc{\large Kevin Tse Ve Koon}\\
+		% Hosting Laboratory:\\
+		% CERMEP - Imagrie du Vivant, Lyon, France\\
+		% 2024-2025
+		%
 	\end{center}
 
 	\vspace{1cm}

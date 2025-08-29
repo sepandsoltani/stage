@@ -15,14 +15,14 @@ An example 3D rendering of a segmented ICA is shown in Figure~\ref{fig:carotid_3
 \begin{figure}[h]
 	\centering
 	\begin{subfigure}{0.45\textwidth}
-		\includegraphics[width=\textwidth]{figures/molgu07704_bbox.png}
+		\includegraphics[width=\textwidth]{segmentation_no_bbox.png}
 		\caption{}
-		\label{subfig:seg_bbox}
+		% \label{subfig:seg_bbox}
 	\end{subfigure}
 	\begin{subfigure}{0.45\textwidth}
-		\includegraphics[width=\textwidth]{figures/molgu07704_nobbox.png}
+		\includegraphics[width=\textwidth]{segmentation_with_bbox.png}
 		\caption{}
-		\label{subfig:seg_nobbox}
+		% \label{subfig:seg_nobbox}
 	\end{subfigure}
 	\caption{Comparison of carotid segmentation (green) with (a) and without (b) a cuboid mask (yellow).}
 	\label{fig:seg_compare}
@@ -52,11 +52,12 @@ For the \yohimbine\ dataset, the maximum feasible \(N=6\) was used given the coh
 In classical spectral analysis, the spectral range is chosen according to the isotope half-life (e.g., \(10^{-4}\,\mathrm{s}^{-1}\) to \(1\,\mathrm{s}^{-1}\) for \(^{18}\mathrm{F}\)) and discretized into \(s=100\) or \(s=1000\) fixed decay rates \(\beta\), while amplitudes \(\alpha\) are fitted to the TAC \cite{cunningham1993spectral}.
 Peaks in the resulting spectrum correspond to dominant kinetic components of the TAC.
 Estimating hundreds of amplitudes with MCMC would be impractical, so a compact basis is preferred in which both decay rates and amplitudes are learned.
-To select the basis size, we assumed the background kinetics could be approximated by the impulse response of either a 1TCM or a 2TCM, which entail one or two exponential basis functions, respectively.
-With two basis functions, the sampler frequently converged to nearly identical decay rates or pushed one rate to infinity, indicating a negligible contribution.
+To select the basis size, we started with only a single basis function which resulted in good convergence.
+When we increased the number of basis functions, the sampler became unstable: the two decay rates collapsed to similar values, one rate tended toward an effectively infinite value, or one amplitude shrank to zero, indicating a negligible contribution from the second exponential component.
 Accordingly, a single exponential basis function was used for both datasets.
 As discussed in Section~\ref{sec:bgtm_modelling}, the PCA weights were assigned the prior \(\theta_i\sim\mathcal{N}(0,1)\).
-The spectral parameters were given weakly informative uniform priors \(\alpha,\beta\sim\mathcal{U}(10^{-5},10^{-2})\) due to the lack of stronger prior knowledge.
+The spectral parameters were given weakly informative uniform priors \(\alpha,\beta\sim\mathcal{U}(10^{-5},10^{-2})\) due to the lack of stronger prior knowledge. 
+The noise prior was specified by empirically setting the coefficient of variation ($CV$) to 1 in \eqref{eq:cv}.
 
 Each Markov chain was run for 230{,}000 iterations with a 30{,}000-iteration burn-in to ensure convergence.
 
@@ -90,7 +91,7 @@ As expected, there are small differences due to noise in larger regions such as 
 \end{figure}
 
 \section{IDIF}
-Because BGTM builds on GTM and incorporates a population AIF prior, performance was compared with GTM-derived IDIF and with a PBIF defined as the mean AIF used in the PCA (\(\mu_{IF}\)).
+Because BGTM builds on GTM and incorporates a PCA trained on a population of AIFs, performance was compared with GTM-derived IDIF and with a PBIF defined as the mean AIF used to build the PCA (\(\mu_{IF}\)).
 
 \subsection{\fdg\ Dataset}
 The reported statistics correspond to the experiment yielding the median validation performance from the fine-tuning stage.
@@ -155,7 +156,7 @@ Relative to PBIF, BGTM also yielded significantly lower \(\mrglu\) MAE (\(t=-2.9
 \subsection{\yohimbine\ Dataset}
 Performance on the \yohimbine\ dataset was lower than on \fdg.
 Figure~\ref{fig:yoh_ifs} compares best- and worst-performing subjects.
-Across subjects, the average cAUC MAE was 55{,}499 for BGTM and 96{,}362 and 37{,}613 for GTM and PBIF, respectively (Figure~\ref{subfig:yoh_cauc_boxplot}).
+As detailed in Table~\ref{tab:metrics_all_yoh}, across subjects, the average cAUC MAE was 55{,}499 for BGTM and 96{,}362 and 37{,}613 for GTM and PBIF, respectively (Figure~\ref{subfig:yoh_cauc_boxplot}).
 By Logan analysis, the average \(V_T\) MAPE was 75.9\%, 166.5\%, and 29.5\% for BGTM, GTM, and PBIF, respectively (Figure~\ref{subfig:yoh_mape_boxplot}).
 
 \begin{figure}[h]
@@ -212,8 +213,8 @@ Figure~\ref{fig:sim_temporal_err} shows the temporal error for one subject, wher
 This underestimation propagates to other IDIF methods and increases bias.
 Figure~\ref{fig:sim_ifs} shows best- and worst-case subjects.
 BGTM provided only a slight improvement in cAUC MAE relative to GTM (53{,}997 versus 57{,}991), and it performed worse than PBIF, which achieved an average cAUC MAE of 23{,}072 (Figure~\ref{subfig:sim_cauc_boxplot}).
-In absolute quantification, BGTM underperformed both comparators, with an average \(\mrglu\) MAPE of 48\% versus 35.6\% for GTM and 18.5\% for PBIF.
-Paired t-tests showed no improvement over GTM for cAUC MAE (\(t=-1.353,\,p=0.185\)) and statistically worse performance than PBIF for cAUC MAE (\(t=9.013,\,p=1.56\times10^{-10}\)), RMSE (\(t=8.805,\,p=2.73\times10^{-10}\)), and AUC APE (\(t=8.317,\,p=1.04\times10^{-9}\)).
+In absolute quantification, BGTM underperformed both comparators, with an average \(\mrglu\) MAPE of 48\% versus 35.6\% for GTM and 18.5\% for PBIF (Figure~\ref{subfig:sim_mape_boxplot}.
+As summarize in Table~\ref{tab:metrics_all_sim}, paired t-tests showed no improvement over GTM for cAUC MAE (\(t=-1.353,\,p=0.185\)) and statistically worse performance than PBIF for cAUC MAE (\(t=9.013,\,p=1.56\times10^{-10}\)), RMSE (\(t=8.805,\,p=2.73\times10^{-10}\)), and AUC APE (\(t=8.317,\,p=1.04\times10^{-9}\)).
 
 
 \begin{figure}[h]
@@ -259,7 +260,7 @@ Paired t-tests showed no improvement over GTM for cAUC MAE (\(t=-1.353,\,p=0.185
 		\label{subfig:sim_cauc_boxplot}
 	\end{subfigure}
 	\caption{Boxplots of curve and quantification errors for the simulated dataset.}
-	\label{fig:sim_boxplots}
+	% \label{fig:sim_boxplots}
 \end{figure}
 
 \begin{figure}[h]

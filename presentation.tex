@@ -205,6 +205,7 @@
 		      \begin{itemize}
 			      \item The \textit{gold} standard
 			      \item Invasive and uncomfortable
+			      \item Labour intensive and error prone
 		      \end{itemize}
 		\item \textbf{Population-Based Input Function (PBIF):} Average blood activity based on set of subjects
 		\item \textbf{Image-Derived Input Function (IDIF):}
@@ -249,18 +250,6 @@
 	\end{tikzpicture}
 \end{frame}
 
-% \begin{frame}{Artery Segmentation Methods}
-% 	\textbf{PET Only:}
-% 	\begin{itemize}
-% 		\item \citeauthoryear{young2023image}: Manual delineation from early PET frames
-% 		\item \citeauthoryear{}: Semi-automatic
-% 		\item \citeauthoryear{chavan2024end}: Fully Automatic U-NET Network
-% 	\end{itemize}
-% 	\textbf{Multi-Modal:}
-% 	\begin{itemize}
-% 		\item \citeauthoryear{dassanayake2022caliper}
-% 	\end{itemize}
-% \end{frame}
 
 \begin{frame}{Artery Segmentation Methods}
 	\begin{columns}
@@ -308,6 +297,11 @@
 	\end{columns}
 \end{frame}
 
+\begin{frame}{Objective}
+    % \centering\Large{Develop a model for Internal Carotid Artery segmentation from TOF-MR Angiography for Image-Derived Input Function}
+    \centering\Large{Obtain an accurate segmentation of the carotids from MR-Angiography for Image-Derived Input Function}
+        % Develop a model for Internal Carotid Artery segmentation from TOF-MR Angiography for Image-Derived Input Function}
+\end{frame}
 
 \section{Methods}
 
@@ -518,6 +512,16 @@
 	\end{center}
 \end{frame}
 
+\begin{frame}{Objective}
+    \centering\Large
+    Obtain an accurate segmentation of the carotids from MR-Angiography for Image-Derived Input Function\\
+    \pause
+    \bigskip
+    + \\
+    \bigskip
+    \Large{Develop a model that can accurately account for PVE and noise}
+\end{frame}
+
 \begin{frame}{Modelling}
 	\small
 	\begin{block}{Input Function}
@@ -577,7 +581,7 @@
 	\begin{block}{Bayesian Parameter Estimation}
 		\small
 		\begin{itemize}
-			\item<2-> Given observed data $\mathcal{D}$, estimate $\Theta=(\textcolor{red}{\theta_1, \theta_2, \theta_3, \alpha, \beta,\mathcal{N}})$
+			\item<2-> Given observed data $\mathcal{D}$, estimate $\Theta=(\textcolor{red}{\theta_1, \theta_2, \theta_3, \alpha, \beta,\sigma^2})$
 			\item<3-> Exploration using a Markov Chain Monte-Carlo Sampler:
 			      \[
 				      \underbrace{p(\Theta \mid \mathcal{D})}_{\text{Posterior}} \propto \underbrace{p(\mathcal{D} \mid \Theta)}_{\text{Likelihood}} \times \underbrace{\pi(\Theta)}_{\text{Prior}}
@@ -613,53 +617,181 @@
 	\end{enumerate}
 
 \end{frame}
+\begin{frame}[t]{For a Specific Subject}
+	\includegraphics[width=\textwidth]{/home/somso/thesis/scripts/ppca20_8/figures/estimation/input_function/PM10845_1_infunc.png}
 
+\end{frame}
 
 \begin{frame}[t]{For a Specific Subject}
 	\begin{center}
 		\vfill
 		\begin{minipage}{0.48\textwidth}
 			\centering
-			\includegraphics[width=\linewidth]{BADKA07504_1_infunc_gtm_bgtm2.png}
+			\includegraphics[width=\linewidth]{PM10845_1_cauc.png}
 		\end{minipage}
 		\begin{minipage}{0.48\textwidth}
 			\centering
-			\includegraphics[width=\linewidth]{BARPH08187_1_fitk3_mrglu.png}
+			\includegraphics[width=\linewidth]{/home/somso/thesis/scripts/ppca20_8/figures/quantification/PM10845_1_patlak_mrglu.png}
 		\end{minipage}
 		\vfill
 	\end{center}
 \end{frame}
 
 
-\begin{frame}[t]{Overall Performance}
-	Quantification error was reduced from 17\% with GTM to 10\% with Bayesian GTM
+\begin{frame}[t]{\fdg\ Overall Performance}
+	\centering
 	\begin{center}
-		% \includegraphics[height=0.8\textheight]{quantification_fitk3_mape_boxplot.png}
+		\includegraphics[width=0.35\textwidth]{fdg_curve_mae_boxplot.png}
+		\includegraphics[width=0.35\textwidth]{fdg_quantification_patlak_mape_boxplot.png}
 	\end{center}
+
+	{
+	\small
+	\begin{tabular}{l|ccc}
+		\toprule
+		Metric             & BGTM   & GTM    & PBIF   \\
+		\midrule
+		IF cAUC MAE        & 13,024 & 15,709 & 14,630 \\
+		$\mrglu$ MAPE (\%) & 13\%   & 24\%   & 17\%   \\
+		\bottomrule
+	\end{tabular}
+
+	}
 \end{frame}
 
+\begin{frame}[t]{\yohimbine\ Overall Performance}
+	\centering
+	\begin{center}
+		\includegraphics[width=0.35\textwidth]{yoh_curve_mae_boxplot.png}
+		\includegraphics[width=0.35\textwidth]{yoh_quantification_logan_mape_boxplot.png}
+	\end{center}
 
-\begin{frame}{Conclusion}
+	{
+	\small
+	\begin{tabular}{l|ccc}
+		\toprule
+		Metric          & BGTM   & GTM    & PBIF   \\
+		\midrule
+		IF cAUC MAE     & 55,499 & 96,300 & 37,600 \\
+		$V_T$ MAPE (\%) & 76\%   & 166\%  & 29\%   \\
+		\bottomrule
+	\end{tabular}
+
+	}
+\end{frame}
+
+\begin{frame}{The Big Question}
+	\centering \huge{Is the Arterial Blood Sampling Actually \\the Ground Truth?}
+	\pause
+	\vspace{1em} \\
+	\large{Simulations can answer that by running experiments\\ in a controlled setting.}
+\end{frame}
+
+\begin{frame}{Simulation}
+	\resizebox{1.0\textwidth}{!}{%
+		\begin{tikzpicture}[
+				node distance=1cm and 2cm,
+				auto,
+				>=Stealth,
+				mybox/.style={draw, rounded corners, rectangle, minimum width=2cm, minimum height=1cm, align=center}
+			]
+
+			\node[mybox,minimum width=3cm] (pet) {PET};
+			\node[mybox,minimum width=3cm, below=of pet] (t1) {T1w MRI};
+			\node[anchor=south east] at($(pet.north)+(0,0.5)$) (pet_image) {\includegraphics[height=2cm]{real_pet.png}};
+			\node[right=0.1cm of pet_image] (t1_image) {\includegraphics[height=2cm]{t1.png}};
+
+
+			\node[mybox, right=3cm of pet, minimum width=3cm] (ttac) {Tissue Activity};
+			\node[mybox, right=3cm of t1, minimum width=3cm] (phantom) {Pseudo-realistic\\Phantom};
+
+			\node[anchor=south east] at($(ttac.north)+(0,0.5)$) (phantom_image) {\includegraphics[height=2cm]{phantom.png}};
+			\node[right=0cm of phantom_image] (ttac_image) {\includegraphics[height=2cm]{ttacs.png}};
+
+			\node[mybox, right=1.5cm of ttac, minimum width=3.3cm] (proto) {Simulation \\ Description Protocol};
+			\node[above=0.5cm of proto] (phantom_image) {\includegraphics[height=2cm]{simulation_input_pet.png}};
+
+			% \node[mybox, right=2.2cm of proto, minimum width=3cm] (simpet) {Simulated PET};
+			% \node[above=0.5cm of simpet] (phantom_image) {\includegraphics[height=2cm]{simulated_pet.png}};
+
+			\draw[->]
+			(pet.east) to[out=0, in=180]
+			node[yshift=+2pt, above] {\scriptsize\textit{Compartmental}}
+			node[yshift=-2pt, below] {\scriptsize\textit{Fitting}}
+			(ttac.west);
+
+			\draw[->]
+			(t1.east) to[out=0, in=180]
+			node[yshift=+2pt, above] {\textit{Tissue}}
+			node[yshift=-2pt, below] {\textit{Classification}}
+			(phantom.west);
+
+			\draw[->] (ttac.east) to[out=0, in=180] (proto.west);
+
+			\draw[->] (phantom.east) to[out=0, in=180] (proto.west);
+
+			% \draw[->]
+			% (proto.east) to[out=0, in=180]
+			% node[yshift=+2pt, above] {\textit{Monte Carlo}}
+			% node[yshift=-2pt, below] {\textit{Simulation}}
+			% (simpet.west);
+
+			\begin{pgfonlayer}{background}
+				\draw[dashed, rounded corners, thick]
+				($(pet.north west)+(-0.3,0.3)$) rectangle ($(t1.south east)+(0.3,-0.3)$);
+			\end{pgfonlayer}
+			\node at ($(t1.south)-(0,0.5)$) {\text{Real Life Data}};
+
+			\begin{pgfonlayer}{background}
+				\draw[dashed, rounded corners, thick]
+				($(ttac.north west)+(-0.3,0.3)$) rectangle ($(phantom.south east)+(0.3,-0.3)$);
+			\end{pgfonlayer}
+			\node at ($(phantom.south)-(0,0.5)$) {\text{Ground Truth}};
+		\end{tikzpicture}
+		%
+	}
+\end{frame}
+
+\begin{frame}{Simulation Results}
+	\includegraphics[width=\textwidth]{sim_compare.jpg}
+
+\end{frame}
+
+\begin{frame}[t]{Simulation Overall Performance}
+	\centering
+	\begin{center}
+		\includegraphics[width=0.35\textwidth]{sim_curve_mae_boxplot.png}
+		\includegraphics[width=0.35\textwidth]{sim_quantification_patlak_mape_boxplot.png}
+	\end{center}
+
+	{
+	\small
+	\begin{tabular}{l|ccc}
+		\toprule
+		Metric             & BGTM   & GTM    & PBIF   \\
+		\midrule
+		IF cAUC MAE        & 53,997 & 57,991 & 23,072 \\
+		$\mrglu$ MAPE (\%) & 48\%   & 35\%   & 18\%   \\
+		\bottomrule
+	\end{tabular}
+
+	}
+\end{frame}
+\begin{frame}{Discussion}
 	\begin{itemize}
-		\setlength\itemsep{2em}
-		\item Promising results with high clinical potential
+		\item Non-invasive IDIF is feasible with BGTM
 		\item No assumptions were taken to allow for \textbf{generalizability} of the method
-		\item \textbf{PET simulations} were conducted to further validate the method
-		\item Independent validation is being done by Paris-Saclay with \textbf{another tracer}
-		\item Method will be \textbf{submitted} in a journal by the end of the internship
+		\item A complete modelling of the system including PVE and the time-varying noise proved crucial
+		\item The carotid segmentation algorithm can be further validated by expert labels
+		\item On \fdg, BGTM cut quantification error to 13\% vs 24\% (GTM) and 17\% (PBIF).
+		\item The results in the \yohimbine\ dataset suffered from low population ($N=6$)
+		\item The true source of discrepancy in the simulation is not known and needs further research
+		\item Further development in a more robust likelihood model, noise model is needed
+		\item TOF-MRA is not widely available and limits immediate applicability
 	\end{itemize}
-
-	% \vspace{1em}
-	% \textbf{Personal}
-	% \vspace{1em}
-	%
-	% \begin{itemize}
-	% 	\setlength\itemsep{2em}
-	%
-	% 	\item Hands-on experience with conducting PET simulations
-	% 	\item Enabled me to deeply understand PET kinetics and modelling
-	% \end{itemize}
 \end{frame}
+
+
 
 
 \end{document}
