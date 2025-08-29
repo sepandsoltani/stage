@@ -28,9 +28,8 @@ For the spectral analysis of the background tissue, we lacked informative prior 
 More informative priors could improve accuracy and robustness.
 
 In the \fdg\ study, a larger PCA population was available, and the subjects were comatose, which minimized motion during the scan and reduced misregistration between the arterial mask and PET.
-Although the subjects imposed challenges 
 These factors allowed for achieving a high performance by BGTM which was not replicated in the \yohimbine\ study.
-This cohort was smaller in comparison and consisted of healthy young adults with greater inter-subject variability.
+This cohort was smaller in comparison resulting in a less accurate PCA and consisted of healthy young adults with greater inter-subject variability.
 In addition, for this tracer, plasma parent correction was required and was applied with a population-based curve, which does not capture subject-specific metabolism.
 These factors likely contributed to the weaker results.
 
@@ -38,7 +37,7 @@ We ran Monte Carlo PET simulations as a complementary evaluation step with the s
 The simulation protocol drew anatomy and kinetics from real scans to keep inputs realistic.
 The goal was quality control of the pipeline rather than replication of individual scans, and comparisons to real data were used only as sanity checks.
 As discussed in Section~\ref{sec:results_simulation}, regional activities were broadly in line with the real data, and Figure~\ref{fig:sim_compare_imgs} shows that early and late frames look adequately consistent with the intended kinetics.
-However, Figure~\ref{fig:sim_tac_compare} shows substantial bias in the Direct IDIF for simulated data compared to the experimental data.
+However, Figure~\ref{fig:all_dataset_curves} shows substantial bias in the Direct IDIF for simulated data compared to the experimental data.
 Naturally, this bias then propagated into GTM and therefore BGTM, causing significantly worse performance compared to the experimental \fdg\ dataset.
 
 Several factors could explain this bias.

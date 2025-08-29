@@ -1,7 +1,16 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
-
-[TODO] 
-
+Dynamic PET quantification requires an arterial input function (AIF), but arterial sampling is invasive.
+Image-derived input functions (IDIFs) offer a non-invasive alternative, yet accurate segmentation of arteries and partial volume effects (PVE) limit accuracy.
+We present an automatic pipeline that segments the internal carotid arteries on TOF-MRA and estimates an IDIF with a Bayesian Geometric Transfer Matrix (BGTM) model.
+The model uses a population-informed PCA prior for the input function, a spectral model for background tissue, and frame-wise weights to account for time-varying noise.
+We evaluated the approach on two experimental cohorts: comatose patients with an injection of \fdg\ and healthy adults with an injection of \yohimbine.
+In the \fdg\ dataset, BGTM improved quantitative accuracy over GTM and a population-based input function (PBIF), reducing \(\mrglu\) error on average (mean MAPE 13\% vs 24\% for GTM and 17\% for PBIF).
+In the \yohimbine\ dataset, BGTM lowered the large errors seen with GTM but did not surpass PBIF (mean \(V_T\) MAPE 75.9\% vs 166.5\% and 29.5\%).
+Performance was likely affected by the small PCA sample and by subject motion.
+We also conducted Monte Carlo PET simulations as complementary validation under controlled conditions, with known ground truth.
+Simulations reproduced realistic brain activity but showed a systematic underestimation of arterial activity relative to the prescribed input.
+Indicating the need for a more rigorous simulation design in future studies
+These results show that non-invasive IDIF is feasible with multimodal PET--MR and principled treatment of PVE and noise, with clear gains for \fdg\ and potential for higher accuracy for other tracers as well.
 \paragraph{Keywords:} Dynamic FDG-PET, Image-Derived Input Function, Hybrid PET/MRI, Bayesian Framework
 

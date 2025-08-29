@@ -77,11 +77,16 @@
 
 \renewcommand\subsection{%
   \@startsection{subsection}{2}{\z@}%
-  {1.2ex plus .2ex minus .2ex}% before-skip
-  {0.5ex}% after-skip
+  {1.2ex plus .2ex minus .2ex}
+  {0.5ex}
   {\normalfont\large\bfseries}}
-\makeatother
 
+\renewcommand\subsubsection{%
+  \@startsection{subsubsection}{3}{\z@}%
+  {0.5ex plus .2ex minus .2ex}
+  {0.5ex}
+  {\normalfont\normalsize\bfseries}}
+\makeatother
 \title{Estimation of Image-Derived Arterial Input Function in Brain PET Imaging: \\ Application to Modeling PET Dynamics of Glucose Metabolism in Patients with Impaired Consciousness}
 
 \author{Sepand Ali Madad Soltani}

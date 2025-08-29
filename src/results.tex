@@ -56,7 +56,7 @@ To select the basis size, we started with only a single basis function which res
 When we increased the number of basis functions, the sampler became unstable: the two decay rates collapsed to similar values, one rate tended toward an effectively infinite value, or one amplitude shrank to zero, indicating a negligible contribution from the second exponential component.
 Accordingly, a single exponential basis function was used for both datasets.
 As discussed in Section~\ref{sec:bgtm_modelling}, the PCA weights were assigned the prior \(\theta_i\sim\mathcal{N}(0,1)\).
-The spectral parameters were given weakly informative uniform priors \(\alpha,\beta\sim\mathcal{U}(10^{-5},10^{-2})\) due to the lack of stronger prior knowledge. 
+The spectral parameters were given weakly informative uniform priors \(\alpha,\beta\sim\mathcal{U}(10^{-5},10^{-2})\) due to the lack of stronger prior knowledge.
 The noise prior was specified by empirically setting the coefficient of variation ($CV$) to 1 in \eqref{eq:cv}.
 
 Each Markov chain was run for 230{,}000 iterations with a 30{,}000-iteration burn-in to ensure convergence.
@@ -216,6 +216,8 @@ BGTM provided only a slight improvement in cAUC MAE relative to GTM (53{,}997 ve
 In absolute quantification, BGTM underperformed both comparators, with an average \(\mrglu\) MAPE of 48\% versus 35.6\% for GTM and 18.5\% for PBIF (Figure~\ref{subfig:sim_mape_boxplot}.
 As summarize in Table~\ref{tab:metrics_all_sim}, paired t-tests showed no improvement over GTM for cAUC MAE (\(t=-1.353,\,p=0.185\)) and statistically worse performance than PBIF for cAUC MAE (\(t=9.013,\,p=1.56\times10^{-10}\)), RMSE (\(t=8.805,\,p=2.73\times10^{-10}\)), and AUC APE (\(t=8.317,\,p=1.04\times10^{-9}\)).
 
+In Figure~\ref{fig:all_dataset_curves}, we see how errors in the Direct IDIF propagates into GTM and therefore BGTM methods.
+
 
 \begin{figure}[h]
 	\centering
@@ -247,6 +249,7 @@ As summarize in Table~\ref{tab:metrics_all_sim}, paired t-tests showed no improv
 	\label{fig:sim_ifs}
 \end{figure}
 
+
 \begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{0.45\textwidth}
@@ -269,8 +272,12 @@ As summarize in Table~\ref{tab:metrics_all_sim}, paired t-tests showed no improv
 	\caption{Relative temporal bias (\%) of Direct IDIF in one experimental subject versus its simulated counterpart.}
 	\label{fig:sim_temporal_err}
 \end{figure}
-
-
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{figures/all_dataset_curve.png}
+	\caption{Comprehensive cUAC MAE boxplot of all datasets for Direct, GTM, BGTM, and PBIF IDIF methods}
+	\label{fig:all_dataset_curves}
+\end{figure}
 \begin{sidewaystable}[b]
 	\centering
 	\small
