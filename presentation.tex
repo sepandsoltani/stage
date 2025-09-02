@@ -24,6 +24,7 @@
 \usepackage{tikz}
 \usepackage{hyperref}
 \usepackage{multicol}
+\usepackage{appendixnumberbeamer}
 \usepackage{tikz}
 \usetikzlibrary{calc, positioning, arrows.meta, arrows, shapes.geometric, shapes, backgrounds, overlay-beamer-styles}
 \usetikzlibrary{decorations.pathreplacing,patterns}
@@ -42,11 +43,29 @@
 \newcommand{\fdg}{$[^{18}\mathrm{F}]\text{FDG}$}
 \newcommand{\yohimbine}{$[^{11}\mathrm{C}]\text{Yohimbine}$}
 
+\newcommand{\sym}[1]{\textsuperscript{#1}}
+
 \makeatletter
 \newcommand\titlegraphicii[1]{\def\inserttitlegraphicii{#1}}
 \newcommand\titlegraphiciii[1]{\def\inserttitlegraphiciii{#1}}
 \newcommand{\citeauthoryear}[1]{\citeauthor{#1} (\citeyear{#1})}
 
+
+\newcounter{backupframe}
+\newcommand{\backupfootline}{%
+  \hfill\usebeamerfont{page number in head/foot}\usebeamercolor[fg]{page number in head/foot}%
+  \roman{backupframe}\kern1em\vskip2pt%
+}
+
+% Environment to create a backup (noframenumbering) frame that shows Roman numerals
+\newenvironment{backup}[1][]{%
+  \stepcounter{backupframe}% increment backup counter
+  \setbeamertemplate{footline}{\backupfootline}% install backup footline
+  \begin{frame}[noframenumbering,#1]%
+}{%
+  \end{frame}%
+  \setbeamertemplate{footline}[frame number]% restore main footline
+}
 
 
 \tikzset{
@@ -97,8 +116,8 @@
 }
 \makeatother
 
-\title{Multi-Modal PET-MR:\\Estimation of Image-Derived Input Function in Hybrid MRI and Dynamic Brain PET Imaging}
-\author{Sepand AliMadadSoltani\\ \vspace{0.5em} \tiny{Supervised by Dr. Nicolas Costes \& Dr. Inés Merida \\ \vspace{0.5em} Hosting Laboratory: CERMEP-Imagerie du Vivant}}
+\title{Estimation of Image-Derived Input Function in Hybrid MRI and Dynamic Brain PET Imaging}
+\author{Sepand Ali Madad Soltani\\ \vspace{0.5em} \tiny{Supervised by Dr. Nicolas Costes \& Dr. Inés Merida \\ \vspace{0.5em} Hosting Laboratory: CERMEP-Imagerie du Vivant}}
 \subtitle{Application to Modeling PET Dynamics of Glucose Metabolism in Patients with Impaired Consciousness}
 \institute{\small Medical Device Engineering}
 \institute{University of Claude Bernard Lyon 1-Polytech Lyon}
@@ -213,10 +232,10 @@
 	\end{itemize}
 
 	\begin{center}
-		\begin{minipage}{0.40\textwidth}
+		\begin{minipage}{0.34\textwidth}
 			\includegraphics[width=\linewidth]{catheter2.jpg}
 		\end{minipage}
-		\begin{minipage}{0.40\textwidth}
+		\begin{minipage}{0.36\textwidth}
 			\includegraphics[width=\linewidth]{aif.png}
 		\end{minipage}
 		\vfill
@@ -258,7 +277,7 @@
 			\textbf{PET Only:}
 			\begin{itemize}
 				\item \textbf{\citeauthoryear{young2023image}}: Manual delineation from early PET frames
-				\item \textbf{\citeauthoryear{chen2007idif}}: Semi-automatic thresholding
+				\item \textbf{\citeauthoryear{vestergaard2021validation}}: Semi-automatic thresholding
 				\item \textbf{\citeauthoryear{chavan2024end}}: Fully Automatic U-NET Network
 			\end{itemize}
 			\vspace{2em}
@@ -298,9 +317,9 @@
 \end{frame}
 
 \begin{frame}{Objective}
-    % \centering\Large{Develop a model for Internal Carotid Artery segmentation from TOF-MR Angiography for Image-Derived Input Function}
-    \centering\Large{Obtain an accurate segmentation of the carotids from MR-Angiography for Image-Derived Input Function}
-        % Develop a model for Internal Carotid Artery segmentation from TOF-MR Angiography for Image-Derived Input Function}
+	% \centering\Large{Develop a model for Internal Carotid Artery segmentation from TOF-MR Angiography for Image-Derived Input Function}
+	\centering\Large{To replace the Invasive AIF:\\Obtain an accurate \textbf{segmentation} of the \textbf{carotids} from \textbf{MR-Angiography} for Image-Derived Input Function}
+	% Develop a model for Internal Carotid Artery segmentation from TOF-MR Angiography for Image-Derived Input Function}
 \end{frame}
 
 \section{Methods}
@@ -409,24 +428,37 @@
 	\end{center}
 \end{frame}
 
-\begin{frame}[t]{Partial Volume Correction(PVC)}
+
+\begin{frame}[t]{Partial Volume Correction (PVC)}
 	\begin{columns}
-		\begin{column}{0.7\textwidth}
+		\begin{column}{0.65\textwidth}
 			\small
 			\begin{itemize}
 				\setlength\itemsep{2em}
-				\item Recovery Coefficient (RC): Spillage coefficients dervied from cylindrical phantoms
-				\item Deep learning models
-				\item Geometric Transfer Matrix (GTM)
+				\item \textbf{\citeauthoryear{feng2015image}}: Recovery Coefficient (RC): Spillage coefficients derived from cylindrical phantoms
+				\item \textbf{\citeauthoryear{rousset1998correction}}: Geometric Transfer Matrix (GTM)
+				\item \textbf{\citeauthoryear{ferrante2024physically}}: Deep learning model
 				\item ...
 			\end{itemize}
+			\vspace{7em}
 		\end{column}
-		\begin{column}{0.3\textwidth}
-			\includegraphics[width=\linewidth]{rc.png}
-			\includegraphics[width=\linewidth]{cnn.png}
+
+		\begin{column}{0.35\textwidth}
+			\includegraphics[width=0.8\linewidth]{/home/somso/thesis/rc.png}\par\vspace{1ex}
+
+			% second image: wider than the column and shifted left to overlap the left column
+			% tweak the two numbers below: the \hspace negative shift and the width of the image
+			\makebox[0pt][l]{%
+				\hspace{-1.2\textwidth}% <- how far left it intrudes (adjust)
+				\includegraphics[width=1.8\textwidth]{/home/somso/thesis/deep.png}% <- actual displayed width (adjust)
+			}
+
 		\end{column}
+
 	\end{columns}
 \end{frame}
+
+
 \begin{frame}{Geometric Transfer Matrix (GTM)}
 	Linear combination of the true Time Activity Curve (TAC) with the other effecting regions
 	\begin{equation*}
@@ -485,82 +517,100 @@
 	\begin{center}
 		% \begin{tikzpicture}
 		% \end{tikzpicture}
-		\includegraphics[height=6cm]{BADKA07504_1_bg_fg3.png}
-		% \begin{tikzpicture}
-		% 	\node[inner sep=0] (imgA) at (0,0)
-		% 	{\includegraphics[height=5cm]{BADKA07504_1_bg_fg.png}};
-		% 	\node[above=0cm of imgA]{$\quad$Artery};
-		% 	% Second image node to the right of the first (adjust xshift if you need spacing)
-		% 	\node[inner sep=0, right=0cm of imgA] (img)
-		% 	{\includegraphics[height=5cm]{BADKA07504_1_bg_fg2.png}};
-		% 	\node[above=0cm of img]{$\quad$Surroundings};
-		%
-		% 	\node[inner sep=0, right=0cm of img,visible on=<2->] (imgC)
-		% 	{\includegraphics[height=5cm]{BADKA07504_1_bg_fg3.png}};
-		% 	\node[above=0cm of imgC,visible on=<2->]{$\quad$GTM Corrected};
-		%
-		%
-		% 	\draw[->, >=stealth, bend left=30,thick]
-		% 	(1.7,2.5) to node[above] {$\omega_{out}$} (3.5,2.5);
-		%
-		% 	\draw[<-, >=stealth, bend right=30,thick]
-		% 	(1.7,-2.5) to node[below] {\small $\omega_{in}$} (3.5,-2.5);
-		% \end{tikzpicture}
-		%
+		% \includegraphics[height=6cm]{BADKA07504_1_bg_fg3.png}
+		\begin{tikzpicture}
+			\node[inner sep=0] (imgA) at (0,0)
+			{\includegraphics[height=5cm]{BADKA07504_1_bg_fg.png}};
+			\node[above=0cm of imgA]{$\quad$Carotid};
+			% Second image node to the right of the first (adjust xshift if you need spacing)
+			\node[inner sep=0, right=0cm of imgA] (img)
+			{\includegraphics[height=5cm]{BADKA07504_1_bg_fg2.png}};
+			\node[above=0cm of img]{$\quad$Surroundings};
+
+			\node[inner sep=0, right=0cm of img,visible on=<2->] (imgC)
+			{\includegraphics[height=5cm]{BADKA07504_1_bg_fg3.png}};
+			\node[above=0cm of imgC,visible on=<2->]{$\quad$GTM Corrected};
+
+
+			\draw[->, >=stealth, bend left=30,thick]
+			(1.7,2.5) to node[above] {$\omega_{out}$} (3.5,2.5);
+
+			\draw[<-, >=stealth, bend right=30,thick]
+			(1.7,-2.5) to node[below] {\small $\omega_{in}$} (3.5,-2.5);
+		\end{tikzpicture}
+
 
 		\uncover<2->{\Large\textbf{Still not Accurate! The Noise is Amplified!}}
 	\end{center}
 \end{frame}
 
 \begin{frame}{Objective}
-    \centering\Large
-    Obtain an accurate segmentation of the carotids from MR-Angiography for Image-Derived Input Function\\
-    \pause
-    \bigskip
-    + \\
-    \bigskip
-    \Large{Develop a model that can accurately account for PVE and noise}
+	\centering\Large
+
+	To replace the Invasive AIF:\\Obtain an accurate \textbf{segmentation} of the \textbf{carotids} from \textbf{MR-Angiography} for Image-Derived Input Function\\
+	% \pause
+	\bigskip
+	+ \\
+	\bigskip
+	\Large{Develop a model that can accurately account for \\
+		\textbf{Partial Volume Effect (PVE)} and \textbf{Noise}}
 \end{frame}
 
 \begin{frame}{Modelling}
 	\small
 	\begin{block}{Input Function}
 		\begin{itemize}
-			\item PCA-based
+			\item Principal Component Analysis:
 		\end{itemize}
 
 		\[
 			T_{IF}(t) = \mu_{IF}(t) +  \textcolor{red}{\theta_1}\,v_1(t) +  \textcolor{red}{\theta_2}\,v_2(t) +  \textcolor{red}{\theta_3}\,v_3(t)
 		\]
-		\(\mu_{IF}(t)\): Population mean AIF (20 Random subjects from the dataset)\\
+		\(\mu_{IF}(t)\): Population mean AIF ($N$ Random subjects from the dataset)\\
 		\(v_{i}(t)\): Principal components \\
 		\(\theta_{i}\): Weighting coefficients
+		% \vspace{3em}
 	\end{block}
+	\pause
 	\begin{block}{Surrounding Tissue}
-		\begin{itemize}
-			\item Spectral Analysis
-		\end{itemize}
-		\[
-			T_{tissue}(t) = T_{IF} \circledast \textcolor{red}{\alpha}\,e^{-\textcolor{red}{\beta}t} (t)
-		\]
+		\vspace{4pt}
+		\begin{columns}[T]
+			\begin{column}[T]{0.6\textwidth}
+				\begin{itemize}
+					\item
+					      Spectral Analysis:
+				\end{itemize}
+				\vspace{1ex}
+				\[
+					T_{tissue}(t) = T_{IF} \circledast \textcolor{red}{\alpha}\,e^{-\textcolor{red}{\beta}t} (t)
+				\]
+				\\
+				$\alpha$: Amplitude\\
+				$\beta$: Decay Rate
+			\end{column}
+
+			\begin{column}{0.25\textwidth}
+				\includegraphics[width=\linewidth]{/home/somso/thesis/sa.png}
+			\end{column}
+		\end{columns}
 	\end{block}
 \end{frame}
 
 \begin{frame}{Modelling}
 	\begin{block}{Noise}
 		\begin{itemize}
-			\setlength\itemsep{1em}
-			\item Noise in PET is multifaceted and has many different sources
-			\item Noise is considered to be a time-varying Gaussian distribution
+			\setlength\itemsep{1.5em}
+			\item Noise in PET has \textbf{many} different sources
+			\item Noise is considered to be a time-varying \textbf{Gaussian distribution}
 			\item It is summarized by a weighted average variance:
 		\end{itemize}
 		\[
 			\sigma^2 = \frac{1}{N} \sum_{i=1}^{N} \omega_i\,\sigma_i^2.
 		\]
-		\(\omega_i\): Weighting Coefficient of frame $i$\\
-		\(\sigma_i^2\): Variance of frame $i$\\
+		\(\omega_i\): Weighting Coefficient of frame $i$\\[1.5em]
+		\(\sigma_i^2\): Variance of frame $i$\\[1.5em]
 		$N$: Number of frames
-		\vspace{6em}
+		% \vspace{3em}
 	\end{block}
 \end{frame}
 
@@ -578,10 +628,10 @@
 		\]
 	\end{block}
 	\pause
-	\begin{block}{Bayesian Parameter Estimation}
+	\begin{block}{Bayesian Parameter Estimation \citeauthoryear{irace2020bayesian}}
 		\small
 		\begin{itemize}
-			\item<2-> Given observed data $\mathcal{D}$, estimate $\Theta=(\textcolor{red}{\theta_1, \theta_2, \theta_3, \alpha, \beta,\sigma^2})$
+			\item<2-> Given observed PET data $\mathcal{D}$, estimate $\Theta=(\textcolor{red}{\theta_1, \theta_2, \theta_3, \alpha, \beta,\sigma^2})$
 			\item<3-> Exploration using a Markov Chain Monte-Carlo Sampler:
 			      \[
 				      \underbrace{p(\Theta \mid \mathcal{D})}_{\text{Posterior}} \propto \underbrace{p(\mathcal{D} \mid \Theta)}_{\text{Likelihood}} \times \underbrace{\pi(\Theta)}_{\text{Prior}}
@@ -599,39 +649,49 @@
 
 
 \section{Results}
-\begin{frame}{Datasets}
-	\begin{enumerate}
-		\large
-		\setlength\itemsep{10em}
+%
+\begin{frame}{Evaluation}
+	\large{\textbf{Datasets:}}
+	\begin{itemize}
+		\setlength\itemsep{1.5em}
+		% \large
 		\item \fdg\ Dataset: 59 comatose patients
 		\item \yohimbine\ Dataset: 7 healthy men
-	\end{enumerate}
-\end{frame}
-\begin{frame}{Evaluation}
+	\end{itemize}
+	\vspace{1em}
+	\large{\textbf{Evaluation Steps:}}
 	\begin{enumerate}
-		\itemsep 6em
-		\large
+		% \large
+		\setlength\itemsep{1em}
 		\item Segmentation: Visual inspection
 		\item Input Function Curves: cumulative Area under the Curve (cAUC) error
 		\item Regional Brain Absolute Quantification
+		      \vspace{1ex}
+		      \begin{itemize}
+			      \setlength\itemsep{1em}
+			      \item \fdg : Metabolic Rate of Glucose ($\mrglu$)
+			      \item \yohimbine : Volume of Distribution ($V_T$)
+		      \end{itemize}
 	\end{enumerate}
-
-\end{frame}
-\begin{frame}[t]{For a Specific Subject}
-	\includegraphics[width=\textwidth]{/home/somso/thesis/scripts/ppca20_8/figures/estimation/input_function/PM10845_1_infunc.png}
-
 \end{frame}
 
-\begin{frame}[t]{For a Specific Subject}
+\begin{frame}[t]{For a Specific \fdg\ Subject}
+	\includegraphics[width=\textwidth]{/home/somso/thesis/scripts/ppca20_8/figures/estimation/input_function/BADKA07504_1_infunc.png}
+
+\end{frame}
+
+\begin{frame}[t]{For a Specific \fdg\ Subject}
 	\begin{center}
 		\vfill
 		\begin{minipage}{0.48\textwidth}
 			\centering
-			\includegraphics[width=\linewidth]{PM10845_1_cauc.png}
+			\textbf{cAUC}
+			\includegraphics[width=\linewidth]{/home/somso/thesis/scripts/ppca20_8/figures/estimation/input_function/BARPH08187_1_cauc.png}
 		\end{minipage}
 		\begin{minipage}{0.48\textwidth}
 			\centering
-			\includegraphics[width=\linewidth]{/home/somso/thesis/scripts/ppca20_8/figures/quantification/PM10845_1_patlak_mrglu.png}
+			\textbf{Regional Quantification}
+			\includegraphics[width=\linewidth]{/home/somso/thesis/scripts/ppca20_8/figures/quantification/BARPH08187_1_patlak_mrglu.png}
 		\end{minipage}
 		\vfill
 	\end{center}
@@ -640,11 +700,20 @@
 
 \begin{frame}[t]{\fdg\ Overall Performance}
 	\centering
-	\begin{center}
-		\includegraphics[width=0.35\textwidth]{fdg_curve_mae_boxplot.png}
-		\includegraphics[width=0.35\textwidth]{fdg_quantification_patlak_mape_boxplot.png}
-	\end{center}
 
+	\begin{center}
+		\begin{minipage}{0.35\textwidth}
+			\centering
+			\textbf{cAUC MAE}\\[0.5ex]
+			\includegraphics[width=\linewidth]{/home/somso/thesis/scripts/ppca20_8/curve_mae_boxplot.png}
+		\end{minipage}
+		\hspace{2em}
+		\begin{minipage}{0.35\textwidth}
+			\centering
+			\textbf{$\mrglu$ MAPE Quantification}\\[0.5ex]
+			\includegraphics[width=\linewidth]{/home/somso/thesis/scripts/ppca20_8/quantification_patlak_mape_boxplot.png}
+		\end{minipage}
+	\end{center}
 	{
 	\small
 	\begin{tabular}{l|ccc}
@@ -655,15 +724,24 @@
 		$\mrglu$ MAPE (\%) & 13\%   & 24\%   & 17\%   \\
 		\bottomrule
 	\end{tabular}
-
 	}
 \end{frame}
 
 \begin{frame}[t]{\yohimbine\ Overall Performance}
 	\centering
+
 	\begin{center}
-		\includegraphics[width=0.35\textwidth]{yoh_curve_mae_boxplot.png}
-		\includegraphics[width=0.35\textwidth]{yoh_quantification_logan_mape_boxplot.png}
+		\begin{minipage}{0.35\textwidth}
+			\centering
+			\textbf{cAUC MAE}\\[0.5ex]
+			\includegraphics[width=\textwidth]{/home/somso/thesis/scripts/laur_1/curve_mae_boxplot.png}
+		\end{minipage}
+		\hspace{2em}
+		\begin{minipage}{0.35\textwidth}
+			\centering
+			\textbf{$V_T$ MAPE Quantification}\\[0.5ex]
+			\includegraphics[width=\textwidth]{/home/somso/thesis/scripts/laur_1/quantification_logan_mape_boxplot.png}
+		\end{minipage}
 	\end{center}
 
 	{
@@ -740,30 +818,39 @@
 				\draw[dashed, rounded corners, thick]
 				($(pet.north west)+(-0.3,0.3)$) rectangle ($(t1.south east)+(0.3,-0.3)$);
 			\end{pgfonlayer}
-			\node at ($(t1.south)-(0,0.5)$) {\text{Real Life Data}};
+			\node at ($(t1.south)-(0,0.6)$) {\text{Real Life Data}};
+			\node at ($(t1.south)-(0,1.1)$) {\text{(\fdg\ Dataset)}};
 
 			\begin{pgfonlayer}{background}
 				\draw[dashed, rounded corners, thick]
 				($(ttac.north west)+(-0.3,0.3)$) rectangle ($(phantom.south east)+(0.3,-0.3)$);
 			\end{pgfonlayer}
-			\node at ($(phantom.south)-(0,0.5)$) {\text{Ground Truth}};
+			\node at ($(phantom.south)-(0,0.6)$) {\text{Ground Truth}};
 		\end{tikzpicture}
 		%
 	}
 \end{frame}
 
 \begin{frame}{Simulation Results}
-	\includegraphics[width=\textwidth]{sim_compare.jpg}
+	\includegraphics[width=\textwidth]{sim_compare2.jpg}
 
 \end{frame}
 
 \begin{frame}[t]{Simulation Overall Performance}
 	\centering
 	\begin{center}
-		\includegraphics[width=0.35\textwidth]{sim_curve_mae_boxplot.png}
-		\includegraphics[width=0.35\textwidth]{sim_quantification_patlak_mape_boxplot.png}
+		\begin{minipage}{0.35\textwidth}
+			\centering
+			\textbf{cAUC MAE}\\[0.5ex]
+			\includegraphics[width=\textwidth]{/home/somso/thesis/scripts/sim_18_7/curve_mae_boxplot.png}
+		\end{minipage}
+		\hspace{2em}
+		\begin{minipage}{0.35\textwidth}
+			\centering
+			\textbf{$\mrglu$ MAPE Quantification}\\[0.5ex]
+			\includegraphics[width=\textwidth]{/home/somso/thesis/scripts/sim_18_7/quantification_patlak_mape_boxplot.png}
+		\end{minipage}
 	\end{center}
-
 	{
 	\small
 	\begin{tabular}{l|ccc}
@@ -777,6 +864,58 @@
 
 	}
 \end{frame}
+\begin{frame}{Limitations \& Discussion}
+	\begin{itemize}
+		\setlength\itemsep{2em}
+		\item Carotid segmentation was satisfactory but can be further validated by \textbf{expert labels}
+		\item Segmentation algorithm can be extended to \textbf{T1-weighted} MRI
+		\item Achieved \textbf{promising results} for the \fdg\ dataset despite the challenging cohort
+        \item \yohimbine\ suffered from \textbf{low PCA population} and subject motion
+		\item Simulation design for IDIF proved to be challenging and requires further research
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Conclusion}
+    \begin{itemize}
+		\setlength\itemsep{2em}
+        \item Segmentation algorithm was simple yet fast and fully automatic
+        \item BGTM successfully recovers IDIF by jointly modelling PVE, Input Function, tissue, and noise
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Conclusions \& Outlook}
+	\begin{itemize}
+		\item \textbf{Joint BGTM benefits:} BGTM can recover an image-derived input by jointly modelling partial-volume effects, time-varying noise and surrounding tissue activity.
+		\item \textbf{Practical spectral choice:} a single spectral term gives a simple, flexible description of tissue kinetics that aids separation of tissue vs vascular signal.
+		\item \textbf{Automation potential:} fast, fully automatic ICA extraction streamlines the pipeline, but requires annotated datasets for rigorous validation.
+		\item \textbf{Value of simulations:} whole-brain Monte Carlo runs are valuable for pipeline QC; refining simulation realism will enable systematic studies of failure modes (AIF shape, background level, framing, scanner geometry).
+		\item \textbf{Next steps:} enlarge the PCA population, consider tracer-specific parametric priors (or empirical priors from fitted AIFs), extend segmentation to common MRI contrasts, and implement per-frame noise estimation.
+	\end{itemize}
+\end{frame}
+\begin{frame}[t]
+	\small
+	\begin{itemize}
+		\item Segmentation validated visually only.
+		\item Tuned to TOF-MRA; needs T1 extension.
+		\item PCA sensitive to cohort size and variability.
+		\item Simplified noise model; per-frame noise would help.
+		\item Simulation artifacts introduced bias.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]
+	\small
+	\begin{itemize}
+		\item BGTM recovers IDIF by jointly modelling PV, noise and tissue.
+		\item Single spectral term gives a simple, robust tissue description.
+		\item Automatic ICA extraction streamlines the pipeline; needs annotations.
+		\item Monte Carlo sims are valuable for QC; refine for systematic tests.
+		\item Next: larger PCA cohorts, tracer-specific priors, per-frame noise.
+	\end{itemize}
+\end{frame}
+
+
 \begin{frame}{Discussion}
 	\begin{itemize}
 		\item Non-invasive IDIF is feasible with BGTM
@@ -791,7 +930,111 @@
 	\end{itemize}
 \end{frame}
 
+\appendix
+% \backupbegin 
+\begin{backup}{\fdg\ Dataset}
+	\centering
+	\resizebox{\textwidth}{!}{% 
+		\begin{tabular}{l|cc|cc|cc|cc|cc}
+			\toprule
+			\multirow{2}{*}{\textbf{Metric}} & \multicolumn{2}{c|}{\textbf{BGTM}} & \multicolumn{2}{c|}{\textbf{GTM}} & \multicolumn{2}{c|}{\textbf{PBIF}} & \multicolumn{2}{c|}{\textbf{BGTM vs GTM}} & \multicolumn{2}{c}{\textbf{BGTM vs PBIF}}                                                                                                                  \\
+			\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
+			                                 & \(\mu\)                            & \(\sigma\)                        & \(\mu\)                            & \(\sigma\)                                & \(\mu\)                                   & \(\sigma\) & \(t\)      & \(p\)                              & \(t\)      & \(p\)                              \\
+			\midrule
+			IF cAUC MAE                      & 13{,}024                           & 10{,}410                          & 15{,}709                           & 7{,}884                                   & 14{,}630                                  & 10{,}268   & \(-2.388\) & \(2.023\times 10^{-2}\) \sym{*}    & \(-1.278\) & \(2.065\times 10^{-1}\)            \\
+			IF cAUC RMSE                     & 20{,}293                           & 16{,}078                          & 23{,}380                           & 11{,}979                                  & 23{,}334                                  & 16{,}803   & \(-1.907\) & \(6.151\times 10^{-2}\) \sym{\dag} & \(-1.439\) & \(1.555\times 10^{-1}\)            \\
+			IF AUC APE (\%)                  & 11.93                              & 10.76                             & 11.57                              & 11.50                                     & 14.34                                     & 11.08      & \(0.297\)  & \(7.674\times 10^{-1}\)            & \(-1.862\) & \(6.767\times 10^{-2}\) \sym{\dag} \\
+			\midrule
+			\(\mrglu\) MAPE (\%)             & 13.19                              & 10.57                             & 24.36                              & 13.68                                     & 17.17                                     & 12.41      & \(-5.459\) & \(1.042\times 10^{-6}\) \sym{***}  & \(-2.415\) & \(1.890\times 10^{-2}\) \sym{*}    \\
+			\(\mrglu\) MAE                   & 1.04                               & 0.92                              & 1.98                               & 1.33                                      & 1.40                                      & 1.10       & \(-5.934\) & \(1.754\times 10^{-7}\) \sym{***}  & \(-2.974\) & \(4.275\times 10^{-3}\) \sym{**}   \\
+			\(R^2\) APE (\%)                 & 1.76                               & 4.07                              & 4.13                               & 8.90                                      & 1.50                                      & 3.53       & \(-2.762\) & \(7.677\times 10^{-3}\) \sym{**}   & \(1.680\)  & \(9.832\times 10^{-2}\)            \\
+			Slope APE (\%)                   & 11.28                              & 9.37                              & 17.05                              & 10.58                                     & 15.76                                     & 11.41      & \(-4.030\) & \(1.644\times 10^{-4}\) \sym{***}  & \(-3.036\) & \(3.583\times 10^{-3}\) \sym{**}   \\
+			\bottomrule
+		\end{tabular}
+		%
+	}
+	\\[1cm]
+	Significance codes: \sym{*}\,p<0.05, \sym{**}\,p<0.01, \sym{***}\,p<0.001, \sym{\dag}\,p<0.10
+
+\end{backup}
+\begin{backup}{\yohimbine\ Dataset}
+	\centering
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{l|cc|cc|cc|cc|cc}
+			\toprule
+			\multirow{2}{*}{\textbf{Metric}} & \multicolumn{2}{c|}{\textbf{BGTM}} & \multicolumn{2}{c|}{\textbf{GTM}} & \multicolumn{2}{c|}{\textbf{PBIF}} & \multicolumn{2}{c|}{\textbf{BGTM vs GTM}} & \multicolumn{2}{c}{\textbf{BGTM vs PBIF}}                                                                                                  \\
+			\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
+			                                 & \(\mu\)                            & \(\sigma\)                        & \(\mu\)                            & \(\sigma\)                                & \(\mu\)                                   & \(\sigma\) & \(t\)      & \(p\)                          & \(t\)      & \(p\)                  \\
+			\midrule
+			IF cAUC MAE                      & 55{,}499                           & 40{,}271                          & 96{,}362                           & 20{,}343                                  & 37{,}613                                  & 20{,}456   & \(-3.404\) & \(1.443\times10^{-2}\)\sym{*}  & \(0.959\)  & \(3.748\times10^{-1}\) \\
+			IF cAUC RMSE                     & 83{,}282                           & 60{,}130                          & 147{,}032                          & 28{,}318                                  & 52{,}313                                  & 27{,}845   & \(-3.789\) & \(9.083\times10^{-3}\)\sym{**} & \(1.196\)  & \(2.768\times10^{-1}\) \\
+			IF AUC APE (\%)                  & 26.14                              & 19.02                             & 52.75                              & 3.53                                      & 17.74                                     & 14.78      & \(-3.644\) & \(1.078\times10^{-2}\)\sym{*}  & \(0.872\)  & \(4.168\times10^{-1}\) \\
+			\midrule
+			\(V_T\) MAPE (\%)                & 75.91                              & 62.09                             & 166.48                             & 52.91                                     & 29.47                                     & 17.73      & \(-3.628\) & \(1.100\times10^{-2}\)\sym{*}  & \(2.588\)  & \(4.133\times10^{-2}\) \\
+			\(V_T\) MAE                      & 0.324                              & 0.211                             & 0.812                              & 0.360                                     & 0.132                                     & 0.072      & \(-3.477\) & \(1.318\times10^{-2}\)\sym{*}  & \(3.042\)  & \(2.275\times10^{-2}\) \\
+			\(R^2\) APE (\%)                 & 2.04                               & 1.83                              & 2.27                               & 3.09                                      & 2.06                                      & 2.40       & \(-0.148\) & \(8.870\times10^{-1}\)         & \(-0.040\) & \(9.692\times10^{-1}\) \\
+			Slope APE (\%)                   & 81.18                              & 68.33                             & 161.80                             & 73.59                                     & 35.06                                     & 24.22      & \(-3.167\) & \(1.939\times10^{-2}\)\sym{*}  & \(2.409\)  & \(5.263\times10^{-2}\) \\
+			\bottomrule
+		\end{tabular}%
+	}
+	\\[1cm]
+	Significance codes: \sym{*}\,p<0.05, \sym{**}\,p<0.01, \sym{***}\,p<0.001, \sym{\dag}\,p<0.10
+\end{backup}
+
+\begin{backup}{Simulated Dataset}
+	\centering
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{l|cc|cc|cc|cc|cc}
+			\toprule
+			\multirow{2}{*}{\textbf{Metric}} & \multicolumn{2}{c|}{\textbf{BGTM}} & \multicolumn{2}{c|}{\textbf{GTM}} & \multicolumn{2}{c|}{\textbf{PBIF}} & \multicolumn{2}{c|}{\textbf{BGTM vs GTM}} & \multicolumn{2}{c}{\textbf{BGTM vs PBIF}}                                                                                                 \\
+			\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
+			                                 & \(\mu\)                            & \(\sigma\)                        & \(\mu\)                            & \(\sigma\)                                & \(\mu\)                                   & \(\sigma\) & \(t\)      & \(p\)                         & \(t\)     & \(p\)                   \\
+			\midrule
+			IF cAUC MAE                      & 53{,}997                           & 21{,}653                          & 57{,}991                           & 20{,}621                                  & 23{,}072                                  & 19{,}136   & \(-1.353\) & \(1.849\times10^{-1}\)        & \(9.013\) & \(1.556\times10^{-10}\) \\
+			IF cAUC RMSE                     & 71{,}835                           & 28{,}603                          & 79{,}860                           & 29{,}010                                  & 30{,}451                                  & 25{,}946   & \(-2.105\) & \(4.279\times10^{-2}\)\sym{*} & \(8.805\) & \(2.732\times10^{-10}\) \\
+			IF AUC APE (\%)                  & 33.35                              & 9.20                              & 36.13                              & 9.46                                      & 12.94                                     & 10.59      & \(-1.612\) & \(1.162\times10^{-1}\)        & \(8.317\) & \(1.043\times10^{-9}\)  \\
+			\midrule
+			\(\mrglu\) MAPE (\%)             & 48.14                              & 27.09                             & 35.60                              & 22.39                                     & 18.56                                     & 11.58      & \(2.678\)  & \(1.133\times10^{-2}\)        & \(6.578\) & \(1.545\times10^{-7}\)  \\
+			\(\mrglu\) MAE                   & 4.62                               & 2.13                              & 3.49                               & 2.21                                      & 1.82                                      & 1.08       & \(2.463\)  & \(1.901\times10^{-2}\)        & \(7.598\) & \(7.919\times10^{-9}\)  \\
+			\(R^2\) APE (\%)                 & 0.35                               & 0.88                              & 0.65                               & 0.88                                      & 0.32                                      & 0.59       & \(-1.636\) & \(1.111\times10^{-1}\)        & \(0.609\) & \(5.466\times10^{-1}\)  \\
+			Slope APE (\%)                   & 45.58                              & 23.70                             & 39.97                              & 23.74                                     & 16.86                                     & 11.37      & \(1.297\)  & \(2.035\times10^{-1}\)        & \(6.812\) & \(7.750\times10^{-8}\)  \\
+			\bottomrule
+		\end{tabular}% 
+	}
+	\\[1cm]
+	Significance codes: \sym{*}\,p<0.05, \sym{**}\,p<0.01, \sym{***}\,p<0.001, \sym{\dag}\,p<0.10
+\end{backup}
 
 
+\begin{backup}{Comparison of relative temporal bias (\%) of Direct IDIF}
+	\includegraphics[width=\textwidth]{figures/GM12051_temporal_error.png}
+\end{backup}
+
+
+\begin{backup}{PCA Tuning}
+	\centering
+	\includegraphics[width=\textwidth]{pca_explained_variance.jpg}
+\end{backup}
+\begin{backup}{PCA Tuning}
+	\centering
+	\includegraphics[width=0.76\textwidth]{pca_n_experiment.jpg}
+\end{backup}
+
+\begin{backup}[t]{Noise Weighting}
+	\[
+		\sigma^2 = \frac{1}{N} \sum_{i=1}^{N} \omega_i\,\sigma_i^2.
+	\]
+	% \(\omega_i\): Weighting Coefficient of frame $i$\\[0.9em]
+	\(\sigma_i^2\): Variance of frame $i$\\[0.9em]
+	$N$: Number of frames
+	\[
+		\omega_{i} = \frac{\Delta t_i}{c_i}\,\exp\!\left(-\frac{t_{i}\,\ln 2}{T_{1/2}}\right)
+	\]
+	\\
+	$\Delta t_i$: Frame durations in seconds \\[0.9em]
+	$c_i$: Net true counts \\[0.9em]
+	$t_i$: Mid-time of the frame \\[0.9em]
+	$T_{1/2}$: Radioisotope half-life
+\end{backup}
 
 \end{document}
