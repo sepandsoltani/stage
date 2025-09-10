@@ -33,8 +33,9 @@
     style=numeric,
     sorting=none,
     maxcitenames=1,
-    style=authoryear
+    % style=authoryear
 ]{biblatex} 
+\AtBeginBibliography{\tiny}
 
 \addbibresource{res/biblio.bib} 
 \addbibresource{res/biblio2.bib} 
@@ -578,7 +579,7 @@
 	\small
 	\begin{block}{Input Function}
 		\begin{itemize}
-            \item Principal Component Analysis(PCA):
+			\item Principal Component Analysis(PCA):
 		\end{itemize}
 
 		\[
@@ -590,7 +591,7 @@
 		% \vspace{3em}
 	\end{block}
 	\pause
-    \begin{block}{Surrounding Tissue (The background)}
+	\begin{block}{Surrounding Tissue (The background)}
 		\vspace{4pt}
 		\begin{columns}[T]
 			\begin{column}[T]{0.6\textwidth}
@@ -618,8 +619,8 @@
 	\begin{block}{Noise}
 		\begin{itemize}
 			\setlength\itemsep{1.5em}
-            \item Noise in PET is considered as a \textbf{Gaussian distribution}
-            \item Noise level is not constant, rather It's \textbf{time-varying}
+			\item Noise in PET is considered as a \textbf{Gaussian distribution}
+			\item Noise level is not constant, rather It's \textbf{time-varying}
 			\item It is summarized by a weighted average variance:
 		\end{itemize}
 		\[
@@ -646,7 +647,7 @@
 		\]
 	\end{block}
 	\pause
-    \begin{block}{Bayesian Parameter Estimation [\citeauthoryear{irace2020bayesian}]}
+	\begin{block}{Bayesian Parameter Estimation [\citeauthoryear{irace2021bayesian}]}
 		\small
 		\begin{itemize}
 			\item<2-> Given observed PET data $\mathcal{D}$, estimate $\Theta=(\textcolor{red}{\theta_1, \theta_2, \theta_3, \alpha, \beta,\sigma^2})$
@@ -813,7 +814,7 @@
 			\draw[->]
 			(pet.east) to[out=0, in=180]
 			node[yshift=+2pt, above] {\scriptsize\textit{Compartmental}}
-            node[yshift=-2pt, below] {\scriptsize\textit{Fitting \& PVC}}
+			node[yshift=-2pt, below] {\scriptsize\textit{Fitting \& PVC}}
 			(ttac.west);
 
 			\draw[->]
@@ -909,8 +910,16 @@
 	\end{itemize}
 \end{frame}
 
+\begin{frame}[t,noframenumbering,plain]{Bibliography}
+    \tiny
+    \printbibliography[heading=none]
+\end{frame}
 
+\begin{frame}[noframenumbering,plain]
+	\centering \huge{Thank you. \\ Questions?}
+\end{frame}
 \appendix
+
 % \backupbegin 
 \begin{backup}{\fdg\ Dataset}
 	\centering
